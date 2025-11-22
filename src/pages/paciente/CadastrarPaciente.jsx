@@ -2,6 +2,17 @@ import { useState } from "react";
 import { cadastrarPaciente } from "../../services/pacienteService";
 import { Link, useNavigate } from "react-router-dom";
 
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+  Stack,
+  Alert,
+} from "@mui/material";
+
 const CadastrarPaciente = () => {
   const navigate = useNavigate();
 
@@ -14,11 +25,11 @@ const CadastrarPaciente = () => {
     senha: "",
   });
 
-  const [erros, setErros] = useState({}); // armazenar erros específicos
+  const [erros, setErros] = useState({});
   const [mensagem, setMensagem] = useState("");
   const [tipoMensagem, setTipoMensagem] = useState("");
 
-  // FUNÇÕES DE VALIDAÇÃO
+  // ---------------- VALIDAÇÕES ------------------
   const validarCampos = () => {
     const novosErros = {};
 
@@ -60,27 +71,27 @@ const CadastrarPaciente = () => {
     return Object.keys(novosErros).length === 0;
   };
 
+  // ---------------- HANDLE CHANGE ----------------
   const handleChange = (e) => {
     setPaciente({ ...paciente, [e.target.name]: e.target.value });
 
-    // remover erro automaticamente ao digitar
     if (erros[e.target.name]) {
       setErros({ ...erros, [e.target.name]: null });
     }
   };
 
+  // ---------------- HANDLE SUBMIT ----------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validarCampos()) {
       setMensagem("Existem erros no formulário. Verifique os campos destacados.");
-      setTipoMensagem("danger");
+      setTipoMensagem("error");
       return;
     }
 
     try {
       await cadastrarPaciente(paciente);
-
       setMensagem("Paciente cadastrado com sucesso!");
       setTipoMensagem("success");
 
@@ -88,152 +99,145 @@ const CadastrarPaciente = () => {
     } catch (error) {
       console.error("Erro ao cadastrar paciente:", error);
       setMensagem("Erro ao cadastrar paciente. Verifique os dados.");
-      setTipoMensagem("danger");
+      setTipoMensagem("error");
     }
   };
 
+  // ---------------- JSX ----------------
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-6">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Cadastre-se
-        </h1>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#f3f4f6",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        p: 2,
+      }}
+    >
+      <Card
+        sx={{
+          width: "100%",
+          maxWidth: 400,
+          p: 2,
+          borderRadius: 3,
+          boxShadow: 3,
+        }}>
+        <CardContent sx={{ p: 1 }}>
+          <Typography variant="h6" align="center" fontWeight="bold" mb={2}>
+            Cadastre-se
+          </Typography>
 
-        {mensagem && (
-          <div
-            className={`mb-3 text-center py-2 rounded-lg text-white ${
-              tipoMensagem === "success" ? "bg-green-600" : "bg-red-500"
-            }`}
-          >
-            {mensagem}
-          </div>
-        )}
+          {mensagem && (
+            <Alert severity={tipoMensagem} sx={{ mb: 2 }}>
+              {mensagem}
+            </Alert>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {/* NOME */}
-          <div>
-            <label className="block text-gray-700 font-medium">Nome *</label>
-            <input
-              type="text"
-              name="nome"
-              value={paciente.nome}
-              onChange={handleChange}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.nome ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.nome && <p className="text-red-500 text-sm">{erros.nome}</p>}
-          </div>
+          <Box component="form" onSubmit={handleSubmit}>
+            <Stack spacing={1.5}>
+              {/* NOME */}
+              <TextField
+                label="Nome *"
+                name="nome"
+                fullWidth
+                value={paciente.nome}
+                onChange={handleChange}
+                error={!!erros.nome}
+                helperText={erros.nome}
+              />
 
-          {/* EMAIL */}
-          <div>
-            <label className="block text-gray-700 font-medium">E-mail *</label>
-            <input
-              type="email"
-              name="email"
-              value={paciente.email}
-              onChange={handleChange}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.email ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.email && <p className="text-red-500 text-sm">{erros.email}</p>}
-          </div>
+              {/* EMAIL */}
+              <TextField
+                label="E-mail *"
+                name="email"
+                type="email"
+                fullWidth
+                value={paciente.email}
+                onChange={handleChange}
+                error={!!erros.email}
+                helperText={erros.email}
+              />
 
-          {/* CPF */}
-          <div>
-            <label className="block text-gray-700 font-medium">CPF *</label>
-            <input
-              type="text"
-              name="cpf"
-              value={paciente.cpf}
-              onChange={handleChange}
-              maxLength={11}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.cpf ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.cpf && <p className="text-red-500 text-sm">{erros.cpf}</p>}
-          </div>
+              {/* CPF */}
+              <TextField
+                label="CPF *"
+                name="cpf"
+                fullWidth
+                inputProps={{ maxLength: 11 }}
+                value={paciente.cpf}
+                onChange={handleChange}
+                error={!!erros.cpf}
+                helperText={erros.cpf}
+              />
 
-          {/* TELEFONE */}
-          <div>
-            <label className="block text-gray-700 font-medium">Telefone</label>
-            <input
-              type="text"
-              name="telefone"
-              value={paciente.telefone}
-              onChange={handleChange}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.telefone ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.telefone && <p className="text-red-500 text-sm">{erros.telefone}</p>}
-          </div>
+              {/* TELEFONE */}
+              <TextField
+                label="Telefone"
+                name="telefone"
+                fullWidth
+                value={paciente.telefone}
+                onChange={handleChange}
+                error={!!erros.telefone}
+                helperText={erros.telefone}
+              />
 
-          {/* DATA DE NASCIMENTO */}
-          <div>
-            <label className="block text-gray-700 font-medium">
-              Data de Nascimento
-            </label>
-            <input
-              type="date"
-              name="dataNascimento"
-              value={paciente.dataNascimento}
-              onChange={handleChange}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.dataNascimento ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.dataNascimento && (
-              <p className="text-red-500 text-sm">{erros.dataNascimento}</p>
-            )}
-          </div>
+              {/* DATA DE NASCIMENTO */}
+              <TextField
+                label="Data de Nascimento"
+                name="dataNascimento"
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                value={paciente.dataNascimento}
+                onChange={handleChange}
+                error={!!erros.dataNascimento}
+                helperText={erros.dataNascimento}
+              />
 
-          {/* SENHA */}
-          <div>
-            <label className="block text-gray-700 font-medium">Senha *</label>
-            <input
-              type="password"
-              name="senha"
-              value={paciente.senha}
-              onChange={handleChange}
-              className={`w-full mt-1 px-3 py-1.5 border rounded-lg shadow-sm 
-                ${erros.senha ? "border-red-500" : "border-gray-300"} 
-                focus:ring-2 focus:ring-blue-500`}
-            />
-            {erros.senha && <p className="text-red-500 text-sm">{erros.senha}</p>}
-            <p className="text-xs text-gray-500 mt-1">
-              A senha será criptografada automaticamente.
-            </p>
-          </div>
+              {/* SENHA */}
+              <TextField
+                label="Senha *"
+                name="senha"
+                type="password"
+                fullWidth
+                value={paciente.senha}
+                onChange={handleChange}
+                error={!!erros.senha}
+                helperText={erros.senha || "A senha será criptografada automaticamente."}
+              />
 
-          {/* BOTÕES */}
-          <div className="mt-4 space-y-2">
-            <button
-              type="submit"
-              className="w-full py-2 bg-blue-600 hover:bg-blue-700 transition text-white font-semibold rounded-lg shadow disabled:opacity-40"
-              disabled={
-                !paciente.nome ||
-                !paciente.email ||
-                !paciente.cpf ||
-                !paciente.senha ||
-                Object.values(erros).some((e) => e)
-              } // desativa se houver erros
-            >
-              Cadastrar
-            </button>
+              {/* BOTÃO CADASTRAR */}
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={
+                  !paciente.nome ||
+                  !paciente.email ||
+                  !paciente.cpf ||
+                  !paciente.senha ||
+                  Object.values(erros).some((e) => e)
+                }
+              >
+                Cadastrar
+              </Button>
 
-            <Link
-              to="/login"
-              className="block text-center w-full py-2 bg-gray-200 hover:bg-gray-300 transition text-gray-800 font-medium rounded-lg shadow"
-            >
-              Já tem conta? Faça login
-            </Link>
-          </div>
-        </form>
-      </div>
-    </div>
+              {/* LINK LOGIN */}
+              <Button
+                component={Link}
+                href="/login"
+                variant="text"
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                Já tem conta? Faça login
+              </Button>
+            </Stack>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
