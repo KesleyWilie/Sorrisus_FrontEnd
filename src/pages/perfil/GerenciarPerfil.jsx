@@ -99,9 +99,10 @@ const GerenciarPerfil = () => {
   if (!data) return <div className="p-10">Nenhum perfil encontrado.</div>;
 
   return (
-    <div className="p-10 bg-slate-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-blue-700">👤 Gerenciar Perfil</h1>
-      <div className="mt-6 p-6 bg-white rounded-xl shadow-md w-full max-w-lg">
+    <div className="min-h-screen bg-slate-100 flex justify-center items-center">
+      <div className="flex flex-col items-center">
+      <h1 className="text-3xl font-bold text-blue-700 mb-6"> Gerenciar Perfil</h1>
+      <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-lg">
         {editando ? (
           <div className="space-y-3">
             <input name="nome" value={form.nome} onChange={handleChange} placeholder="Nome" className="w-full border px-2 py-1 rounded"/>
@@ -123,7 +124,7 @@ const GerenciarPerfil = () => {
               <input name="turno" value={form.turno} onChange={handleChange} placeholder="Turno" className="w-full border px-2 py-1 rounded"/>
             )}
             <div className="flex gap-2">
-              <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded">Salvar</button>
+              <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
               <button onClick={() => setEditando(false)} className="bg-gray-300 text-black px-4 py-2 rounded">Cancelar</button>
             </div>
           </div>
@@ -151,6 +152,7 @@ const GerenciarPerfil = () => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };
