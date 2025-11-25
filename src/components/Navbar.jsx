@@ -23,34 +23,34 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+      <nav className="bg-blue-600 shadow-sm border-b border-blue-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-3">
               <img src="sorrisus.png" alt="Sorrisus" className="w-10 h-10 rounded-lg object-contain" />
-              <span className="text-xl font-bold text-gray-800">Sorrisus</span>
+              <span className="text-xl font-bold text-white">Sorrisus</span>
             </Link>
 
             {/* Menu */}
             <div className="hidden md:flex items-center gap-6">
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <Home className="w-5 h-5" />
                 <span className="font-medium">Dashboard</span>
               </Link>
               <Link
                 to="/pacientes"
-                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <Users className="w-5 h-5" />
                 <span className="font-medium">Pacientes</span>
               </Link>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">Agendamentos</span>
@@ -75,9 +75,9 @@ const Navbar = () => {
                     navigate("/perfil");
                   }
                 }}
-                className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg cursor-pointer"
+                className="flex items-center gap-3 px-4 py-2 bg-white/90 rounded-lg cursor-pointer"
               >
-                <User className="w-5 h-5 text-gray-600" />
+                <User className="w-5 h-5 text-gray-700" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm font-medium text-gray-700">
                     {user?.email || "Usuário"}
