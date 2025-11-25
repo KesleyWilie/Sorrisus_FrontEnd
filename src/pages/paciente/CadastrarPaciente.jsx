@@ -210,14 +210,25 @@ const CadastrarPaciente = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <img src="/teeth.png" alt="Sorrisus" className="w-10 h-10 object-contain" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-center">Sorrisus</h1>
+            <p className="text-blue-100 text-center mt-2">Sistema Odontológico</p>
+          </div>
 
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          Cadastre-se
-        </h1>
+          {/* Conteúdo */}
+          <div className="p-8">
+            <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Cadastre-se</h1>
 
-        {mensagem && (
+          {mensagem && (
           <div
             className={`mb-3 text-center py-2 rounded-lg text-white ${
               tipoMensagem === "success" ? "bg-green-600" : "bg-red-500"
@@ -360,8 +371,8 @@ const CadastrarPaciente = () => {
           </div>
         </form>
 
-        {/* Link para Login, estilizado conforme o molde */}
-        <div className="mt-6 text-center">
+          {/* Link para Login, estilizado conforme o molde */}
+          <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
             Já tem uma conta?{" "}
             <Link
@@ -371,7 +382,12 @@ const CadastrarPaciente = () => {
               Faça login
             </Link>
           </p>
+            </div>
+          </div>
         </div>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-500 mt-6">© 2025 Sorrisus. Todos os direitos reservados.</p>
       </div>
     </div>
   );
