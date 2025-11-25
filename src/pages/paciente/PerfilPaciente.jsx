@@ -1,31 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { buscarDentistaPorId, atualizarDentista } from "../../services/dentistaService";
+import { buscarPacientePorId, atualizarPaciente } from "../../services/pacienteService";
 
-const PerfilDentista = () => {
+const PerfilPaciente = () => {
   const token = localStorage.getItem("accessToken");
   const decoded = token ? jwtDecode(token) : {};
 
-  const [dentista, setDentista] = useState(null);
+  const [paciente, setPaciente] = useState(null);
   const [editando, setEditando] = useState(false);
-  const [formDentista, setFormDentista] = useState({
+  const [formPaciente, setFormPaciente] = useState({
     nome: "",
     email: "",
-    cro: "",
-    especialidade: "",
+    turno: "",
+    cpf: "",
+    telefone: "",
+    dataNascimento: "",
   });
 
   // Buscar perfil do dentista
   useEffect(() => {
-    if (decoded.id) {   
-      buscarDentistaPorId(decoded.id)
+    if (decoded.id) {  
+      buscarPacientePorId(decoded.id)
         .then((response) => {
-          setDentista(response.data);
-          setFormDentista({
+          setPaciente(response.data);
+          setFormPaciente({
             nome: response.data.nome,
             email: response.data.email,
-            cro: response.data.cro,
-            especialidade: response.data.especialidade,
+            cpf: response.data.cpf,
+            telefone: response.data.telefone,
+            dataNascimento: response.data.dataNascimento,
           });
         })
         .catch((error) => console.error("Erro ao carregar perfil:", error));
@@ -34,29 +37,30 @@ const PerfilDentista = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormDentista((prev) => ({ ...prev, [name]: value }));
+    setFormPaciente((prev) => ({ ...prev, [name]: value }));
   };
 
   const salvarAlteracoes = () => {
-    atualizarDentista(decoded.id, formDentista) 
+    atualizarPaciente(decoded.id, formPaciente)
       .then((response) => {
-        setDentista(response.data);
+        console.log("Resposta do backend:", response);
+        setPaciente(response.data);
         setEditando(false);
         alert("Perfil atualizado com sucesso!");
       })
       .catch((error) => {
-        console.error("Erro ao atualizar perfil:", error);
+        console.error("Erro detalhado do backend:", error.response?.data);
         alert("Erro ao atualizar perfil. Verifique os dados.");
       });
   };
 
-  if (!dentista) {
+  if (!paciente) {
     return <div className="p-10">Carregando perfil...</div>;
   }
 
   return (
     <div className="p-10 bg-slate-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-blue-700">👤 Perfil do Dentista</h1>
+      <h1 className="text-3xl font-bold text-blue-700">👤 Perfil do Paciente</h1>
 
       <div className="mt-6 p-6 bg-white rounded-xl shadow-md w-full max-w-lg">
         {editando ? (
@@ -64,7 +68,7 @@ const PerfilDentista = () => {
             <input
               type="text"
               name="nome"
-              value={formDentista.nome}
+              value={formPaciente.nome}
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
               placeholder="Nome"
@@ -72,26 +76,34 @@ const PerfilDentista = () => {
             <input
               type="email"
               name="email"
-              value={formDentista.email}
+              value={formPaciente.email}
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
               placeholder="Email"
             />
             <input
               type="text"
-              name="cro"
-              value={formDentista.cro}
+              name="cpf"
+              value={formPaciente.cpf}
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
-              placeholder="CRO"
+              placeholder="CPF"
             />
             <input
               type="text"
-              name="especialidade"
-              value={formDentista.especialidade}
+              name="telefone"
+              value={formPaciente.telefone}
               onChange={handleChange}
               className="w-full border px-2 py-1 rounded"
-              placeholder="Especialidade"
+              placeholder="Telefone"
+            />
+            <input
+              type="date"
+              name="dataNascimento"
+              value={formPaciente.dataNascimento}
+              onChange={handleChange}
+              className="w-full border px-2 py-1 rounded"
+              placeholder="Data de Nascimento"
             />
             <div className="flex gap-2">
               <button
@@ -110,10 +122,11 @@ const PerfilDentista = () => {
           </div>
         ) : (
           <div>
-            <p><strong>Nome:</strong> {dentista.nome}</p>
-            <p><strong>Email:</strong> {dentista.email}</p>
-            <p><strong>CRO:</strong> {dentista.cro}</p>
-            <p><strong>Especialidade:</strong> {dentista.especialidade}</p>
+            <p><strong>Nome:</strong> {paciente.nome}</p>
+            <p><strong>Email:</strong> {paciente.email}</p>
+            <p><strong>CPF:</strong> {paciente.cpf}</p>
+            <p><strong>Telefone:</strong> {paciente.telefone}</p>
+            <p><strong>Data de Nascimento:</strong> {paciente.dataNascimento}</p>
             <button
               onClick={() => setEditando(true)}
               className="mt-3 bg-blue-600 text-white px-4 py-2 rounded"
@@ -127,4 +140,4 @@ const PerfilDentista = () => {
   );
 };
 
-export default PerfilDentista;
+export default PerfilPaciente;

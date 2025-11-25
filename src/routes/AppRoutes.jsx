@@ -8,6 +8,10 @@ import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
 // Páginas de Dentista
 import PerfilDentista from "../pages/dentista/PerfilDentista.jsx";
 
+import PerfilRecepcionista from "../pages/recepcionista/PerfilRecepcionista.jsx";
+
+import PerfilPaciente from "../pages/paciente/PerfilPaciente.jsx";
+
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
 export default function AppRoutes() {
@@ -29,6 +33,9 @@ export default function AppRoutes() {
 
         <Route path="/perfil" element={<PerfilDentista />} />
 
+        <Route path="/perfil-recepcionista" element={<PerfilRecepcionista />} />
+
+        <Route path="/perfil-paciente" element={<PerfilPaciente />} />
        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
