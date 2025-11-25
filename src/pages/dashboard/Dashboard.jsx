@@ -1,90 +1,101 @@
-import Navbar from "../../components/Navbar";
-import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+import { botoesConfig } from './DashboardConfig';
+import LogoutModal from '../../components/LogoutModal'; 
 
 const Dashboard = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+  const navigate = useNavigate();
+  const [userRole, setUserRole] = useState(null); 
+  const [userName, setUserName] = useState("");   
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+ 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const roleDoToken = decoded.role || decoded.roles || decoded.authorities;
+        
+        console.log("Perfil validado:", roleDoToken);
+        if (!roleDoToken) console.warn("Token sem role definida!");
+
+        setUserRole(roleDoToken);
+        setUserName(decoded.sub || ""); 
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Visão geral do sistema Sorrisus</p>
+      } catch (error) {
+        console.error("Erro token:", error);
+        localStorage.removeItem('token'); 
+        navigate('/'); 
+      }
+    } else {
+      console.warn("Sem token.");
+      navigate('/'); 
+    }
+  }, [navigate]);
+
+ 
+  const handleLogoutConfirm = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
+  
+  const buttonBaseClass = "bg-[#3a7ca5] hover:bg-[#2d6a88] text-white text-lg font-medium py-4 px-6 rounded-md shadow-sm transition-colors duration-200";
+  const headerLinkClass = "text-gray-500 hover:text-gray-700 cursor-not-allowed";
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col font-sans relative">
+      
+      
+      <header className="flex justify-between items-center p-8 border-b border-gray-100">
+        <nav className="space-x-8 text-lg">
+          <span className={headerLinkClass}>Início</span>
+          <span className={headerLinkClass}>Meio</span>
+          <span className={headerLinkClass}>Fim</span>
+        </nav>
+        <div className="flex items-center gap-4">
+          {userName && <span className="text-gray-600 text-sm">Olá, {userName}</span>}
+          <button onClick={() => setShowLogoutModal(true)} className="bg-[#3a7ca5] hover:bg-[#2d6a88] text-white font-bold py-2 px-6 rounded">
+            Logout
+          </button>
         </div>
+      </header>
 
-        {/* Cards Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Total Pacientes</p>
-                <p className="text-2xl font-bold text-gray-800">248</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
+      
+      <main className="flex-grow flex flex-col items-center pt-16 pb-10 px-4">
+        <h1 className="text-5xl font-bold text-[#2c3e50] mb-16 drop-shadow-md">
+          Menu
+        </h1>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Consultas Hoje</p>
-                <p className="text-2xl font-bold text-gray-800">12</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Dentistas</p>
-                <p className="text-2xl font-bold text-gray-800">8</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <UserCog className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Taxa Ocupação</p>
-                <p className="text-2xl font-bold text-gray-800">87%</p>
-              </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
+       
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 max-w-4xl w-full text-center">
+          {botoesConfig.map((botao, index) => {
+            if (userRole && botao.roles.includes(userRole)) {
+              return (
+                <button 
+                  key={index} 
+                  onClick={() => botao.action(navigate)} 
+                  className={buttonBaseClass}
+                >
+                  {botao.label}
+                </button>
+              );
+            }
+            return null;
+          })}
         </div>
+      </main>
 
-        {/* Módulos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl shadow-lg text-white">
-            <Users className="w-8 h-8 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Pacientes</h3>
-            <p className="text-blue-100 text-sm">Gerenciar cadastro de pacientes</p>
-          </div>
+      
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)} 
+        onConfirm={handleLogoutConfirm} 
+      />
 
-          <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl shadow-lg text-white">
-            <UserCog className="w-8 h-8 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Dentistas</h3>
-            <p className="text-green-100 text-sm">Gerenciar equipe odontológica</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl shadow-lg text-white">
-            <Calendar className="w-8 h-8 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Agendamentos</h3>
-            <p className="text-purple-100 text-sm">Gerenciar consultas e horários</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
