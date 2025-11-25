@@ -8,9 +8,7 @@ import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
 
 // Páginas de Perfis
-import PerfilDentista from "../pages/dentista/PerfilDentista.jsx";
-import PerfilRecepcionista from "../pages/recepcionista/PerfilRecepcionista.jsx";
-import PerfilPaciente from "../pages/paciente/PerfilPaciente.jsx";
+import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
 
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
@@ -41,10 +39,15 @@ export default function AppRoutes() {
             }
           />
 
-          {/* Perfis */}
-          <Route path="/perfil-dentista" element={<PerfilDentista />} />
-          <Route path="/perfil-recepcionista" element={<PerfilRecepcionista />} />
-          <Route path="/perfil-paciente" element={<PerfilPaciente />} />
+          {/* Perfil unificado */}
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <GerenciarPerfil />
+              </PrivateRoute>
+            }
+          />
 
           {/* Redirecionamentos */}
           <Route path="/" element={<Navigate to="/login" />} />

@@ -69,19 +69,14 @@ const Navbar = () => {
                 title="Ver perfil"
                 onClick={() => {
                   if (!user?.role) return;
-                  const role = user.role;
-                  if (role === "ROLE_DENTISTA") navigate("/perfil-dentista");
-                  else if (role === "ROLE_PACIENTE") navigate("/perfil-paciente");
-                  else if (role === "ROLE_RECEPCIONISTA") navigate("/perfil-recepcionista");
+                  navigate("/perfil");
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
                     e.preventDefault();
                     if (!user?.role) return;
                     const role = user.role;
-                    if (role === "ROLE_DENTISTA") navigate("/perfil-dentista");
-                    else if (role === "ROLE_PACIENTE") navigate("/perfil-paciente");
-                    else if (role === "ROLE_RECEPCIONISTA") navigate("/perfil-recepcionista");
+                    navigate("/perfil");
                   }
                 }}
                 className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg cursor-pointer"
