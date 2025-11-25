@@ -1,10 +1,41 @@
 import Navbar from "../../components/Navbar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { listarPacientes } from "../../services/pacienteService";
+import { listarDentistas } from "../../services/dentistaService";
 import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
+  const [pacientesCount, setPacientesCount] = useState(null);
+  const [dentistasCount, setDentistasCount] = useState(null);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    let mounted = true;
+    const fetchCounts = async () => {
+      try {
+        const [pRes, dRes] = await Promise.all([listarPacientes(), listarDentistas()]);
+        if (!mounted) return;
+        const getCount = (res) => {
+          if (!res || typeof res !== 'object') return 0;
+          const body = res.data;
+          if (Array.isArray(body)) return body.length;
+          if (body?.content && Array.isArray(body.content)) return body.content.length;
+          if (Array.isArray(body?.data)) return body.data.length;
+          if (typeof body?.totalElements === 'number') return body.totalElements;
+          if (typeof body?.total === 'number') return body.total;
+          if (typeof body?.length === 'number') return body.length;
+          return 0;
+        };
+        setPacientesCount(getCount(pRes));
+        setDentistasCount(getCount(dRes));
+      } catch (err) {
+        console.error('Erro ao buscar contagens:', err);
+        if (!mounted) return;
+        setError('Erro ao carregar dados');
+      }
+    };
+    fetchCounts();
+    return () => { mounted = false; };
   }, []);
 
   return (
@@ -24,7 +55,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Pacientes</p>
-                <p className="text-2xl font-bold text-gray-800">248</p>
+                <p className="text-2xl font-bold text-gray-800">{pacientesCount ?? "-"}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -48,7 +79,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Dentistas</p>
-                <p className="text-2xl font-bold text-gray-800">8</p>
+                <p className="text-2xl font-bold text-gray-800">{dentistasCount ?? "-"}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                 <UserCog className="w-6 h-6 text-purple-600" />
