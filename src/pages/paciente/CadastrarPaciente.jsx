@@ -1,27 +1,30 @@
 import { useState } from "react";
 import { cadastrarPaciente } from "../../services/pacienteService";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  User,
+  MailIcon,
+  LockIcon,
+  Phone,
+  Calendar,
+  FingerprintIcon,
+} from "lucide-react";
 
-// Componente de Ícone de Exemplo
+/**
+ * Componente de Input com Ícone Integrado usando lucide-react.
+ * O componente de ícone (ex: <User />) é passado via prop 'icon' e renderizado.
+ */
 const InputIcon = ({ icon: Icon, placeholder, type, name, value, onChange, error, ...props }) => {
   const iconClasses = "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400";
   const inputClasses = `w-full pl-10 pr-3 py-2 border rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ${
     error ? "border-red-500" : "border-gray-300"
-  } ${type === "date" ? "appearance-none" : ""}`; // Adicionado appearance-none para o input date
+  } ${type === "date" ? "appearance-none" : ""}`;
 
   return (
     <div className="relative">
-      {/* Ícone é simulado aqui */}
       <div className={iconClasses}>
-        {/* SVG Ícones conforme o campo */}
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          {name === "nome" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />}
-          {name === "email" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />}
-          {name === "cpf" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.5v15m0 0l-4.5-4.5M12 19.5l4.5-4.5M12 19.5v-15" />}
-          {name === "telefone" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 3-4-3H5a2 2 0 01-2-2V5z" />}
-          {name === "dataNascimento" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />}
-          {name === "senha" && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6-6h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />}
-        </svg>
+        {/* Renderiza o componente de ícone Lucide recebido via prop */}
+        <Icon className="w-5 h-5" />
       </div>
       
       <input
@@ -185,13 +188,12 @@ const CadastrarPaciente = () => {
         telefone: paciente.telefone ? paciente.telefone.replace(/[^\d]/g, "") : "",
       };
 
-      // A função 'cadastrarPaciente' agora usa o mock service.
+      // A função 'cadastrarPaciente' usa o mock service.
       await cadastrarPaciente(pacienteParaEnvio);
 
       setMensagem("Paciente cadastrado com sucesso!");
       setTipoMensagem("success");
 
-      // Note: A navegação para /login requer que o router (como BrowserRouter) esteja configurado.
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       console.error("Erro ao cadastrar paciente:", error);
@@ -233,6 +235,7 @@ const CadastrarPaciente = () => {
             <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-1">Nome *</label> 
             <InputIcon
               id="nome"
+              icon={User}
               type="text"
               name="nome"
               placeholder="Digite seu nome completo"
@@ -249,6 +252,7 @@ const CadastrarPaciente = () => {
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">E-mail *</label> 
             <InputIcon
               id="email"
+              icon={MailIcon}
               type="email"
               name="email"
               placeholder="Digite seu e-mail"
@@ -265,6 +269,7 @@ const CadastrarPaciente = () => {
             <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-1">CPF *</label>
             <InputIcon
               id="cpf"
+              icon={FingerprintIcon}
               type="text"
               name="cpf"
               placeholder="999.999.999-99"
@@ -282,6 +287,7 @@ const CadastrarPaciente = () => {
             <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-1">Telefone *</label>
             <InputIcon
               id="telefone"
+              icon={Phone}
               type="text"
               name="telefone"
               placeholder="(99) 99999-9999"
@@ -301,9 +307,10 @@ const CadastrarPaciente = () => {
             </label>
             <InputIcon
               id="dataNascimento"
+              icon={Calendar}
               type="date"
               name="dataNascimento"
-              placeholder="" // Tipo date não usa placeholder
+              placeholder=""
               value={paciente.dataNascimento}
               onChange={handleChange}
               error={erros.dataNascimento}
@@ -319,6 +326,7 @@ const CadastrarPaciente = () => {
             <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-1">Senha *</label>
             <InputIcon
               id="senha"
+              icon={LockIcon}
               type="password"
               name="senha"
               placeholder="Digite sua senha"
