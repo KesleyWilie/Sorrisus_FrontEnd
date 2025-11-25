@@ -63,7 +63,29 @@ const Navbar = () => {
 
             {/* User Info e Logout */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg">
+              <div
+                role="button"
+                tabIndex={0}
+                title="Ver perfil"
+                onClick={() => {
+                  if (!user?.role) return;
+                  const role = user.role;
+                  if (role === "ROLE_DENTISTA") navigate("/perfil-dentista");
+                  else if (role === "ROLE_PACIENTE") navigate("/perfil-paciente");
+                  else if (role === "ROLE_RECEPCIONISTA") navigate("/perfil-recepcionista");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+                    e.preventDefault();
+                    if (!user?.role) return;
+                    const role = user.role;
+                    if (role === "ROLE_DENTISTA") navigate("/perfil-dentista");
+                    else if (role === "ROLE_PACIENTE") navigate("/perfil-paciente");
+                    else if (role === "ROLE_RECEPCIONISTA") navigate("/perfil-recepcionista");
+                  }
+                }}
+                className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg cursor-pointer"
+              >
                 <User className="w-5 h-5 text-gray-600" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm font-medium text-gray-700">
