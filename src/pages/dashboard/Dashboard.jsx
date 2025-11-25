@@ -1,7 +1,12 @@
 import Navbar from "../../components/Navbar";
+import { useEffect } from "react";
 import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -39,9 +44,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-  useEffect(() => {
-   
-    const token = localStorage.getItem('accessToken');
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { buscarRecepcionistaPorId, atualizarRecepcionista } from "../../services/recepcionistaService";
+import { getUserId, getRole } from "../../services/authService";
 
 const PerfilRecepcionista = () => {
-  const token = localStorage.getItem("accessToken");
-  const decoded = token ? jwtDecode(token) : {};
+  const userId = getUserId() || localStorage.getItem("userId");
+  const role = getRole() || localStorage.getItem("role");
 
   const [recepcionista, setRecepcionista] = useState(null);
   const [editando, setEditando] = useState(false);
@@ -14,10 +14,10 @@ const PerfilRecepcionista = () => {
     turno: "",
   });
 
-  // Buscar perfil do dentista
   useEffect(() => {
-    if (decoded.id) {   
-      buscarRecepcionistaPorId(decoded.id) 
+    if (!userId || role !== "ROLE_RECEPCIONISTA") return; 
+    if (userId) {
+      buscarRecepcionistaPorId(userId)
         .then((response) => {
           setRecepcionista(response.data);
           setFormRecepcionista({
@@ -28,7 +28,10 @@ const PerfilRecepcionista = () => {
         })
         .catch((error) => console.error("Erro ao carregar perfil:", error));
     }
-  }, [decoded.id]);
+  }, [userId, role]);
+
+  if (!userId) return <div className="p-10">Usuário não identificado.</div>;
+  if (role !== "ROLE_RECEPCIONISTA") return <div className="p-10 text-red-600">Acesso negado. Apenas Recepcionistas podem acessar esse perfil.</div>;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +39,7 @@ const PerfilRecepcionista = () => {
   };
 
   const salvarAlteracoes = () => {
-    atualizarRecepcionista(decoded.id, formRecepcionista) 
+    atualizarRecepcionista(userId, formRecepcionista) 
       .then((response) => {
         setRecepcionista(response.data);
         setEditando(false);

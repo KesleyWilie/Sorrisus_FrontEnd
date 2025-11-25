@@ -42,7 +42,7 @@ export default function AppRoutes() {
           />
 
           {/* Perfis */}
-          <Route path="/perfil" element={<PerfilDentista />} />
+          <Route path="/perfil-dentista" element={<PerfilDentista />} />
           <Route path="/perfil-recepcionista" element={<PerfilRecepcionista />} />
           <Route path="/perfil-paciente" element={<PerfilPaciente />} />
 

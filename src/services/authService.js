@@ -9,6 +9,7 @@ export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem("role");
+  localStorage.removeItem("userId");
 };
 
 export const isAuthenticated = () => {
@@ -24,6 +25,10 @@ export const getRole = () => {
   return localStorage.getItem("role");
 };
 
+export const getUserId = () => {
+  return localStorage.getItem("userId");
+};
+
 export const setAuthData = (authData) => {
   localStorage.setItem("token", authData.accessToken);
   localStorage.setItem("user", JSON.stringify({
@@ -31,4 +36,5 @@ export const setAuthData = (authData) => {
     role: authData.role
   }));
   localStorage.setItem("role", authData.role);
+  localStorage.setItem("userId", authData.userId);
 };

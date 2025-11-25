@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { buscarPacientePorId, atualizarPaciente } from "../../services/pacienteService";
+import { getUserId, getRole } from "../../services/authService";
 
 const PerfilPaciente = () => {
-  const token = localStorage.getItem("accessToken");
-  const decoded = token ? jwtDecode(token) : {};
+  const userId = getUserId() || localStorage.getItem("userId");
+  const role = getRole() || localStorage.getItem("role");
 
   const [paciente, setPaciente] = useState(null);
   const [editando, setEditando] = useState(false);
@@ -17,10 +17,10 @@ const PerfilPaciente = () => {
     dataNascimento: "",
   });
 
-  // Buscar perfil do dentista
   useEffect(() => {
-    if (decoded.id) {  
-      buscarPacientePorId(decoded.id)
+    if (!userId || role !== "ROLE_PACIENTE") return;
+    if (userId) {
+      buscarPacientePorId(userId)
         .then((response) => {
           setPaciente(response.data);
           setFormPaciente({
@@ -33,7 +33,10 @@ const PerfilPaciente = () => {
         })
         .catch((error) => console.error("Erro ao carregar perfil:", error));
     }
-  }, [decoded.id]);
+  }, [userId, role]);
+
+  if (!userId) return <div className="p-10">Usuário não identificado.</div>;
+  if (role !== "ROLE_PACIENTE") return <div className="p-10 text-red-600">Acesso negado. Apenas Pacientes podem acessar esse perfil.</div>;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +44,7 @@ const PerfilPaciente = () => {
   };
 
   const salvarAlteracoes = () => {
-    atualizarPaciente(decoded.id, formPaciente)
+    atualizarPaciente(userId, formPaciente)
       .then((response) => {
         console.log("Resposta do backend:", response);
         setPaciente(response.data);
