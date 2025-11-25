@@ -1,31 +1,45 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import PrivateRoute from "../components/PrivateRoute";
 
-// Importa páginas existentes
+// Páginas
+import Login from "../pages/auth/Login.jsx";
 import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
-// import EditarPaciente from "../pages/paciente/EditarPaciente";
-
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas Públicas */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/pacientes/cadastrar" element={<CadastrarPaciente />} />
 
-        
-        <Route path="/" element={<Navigate to="/pacientes/cadastrar" />} />
+          {/* Rotas Privadas */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pacientes"
+            element={
+              <PrivateRoute>
+                <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
 
-        
-        <Route path="/pacientes" element={<ListarPaciente />} />
-        <Route path="/pacientes/cadastrar" element={<CadastrarPaciente />} />
-       
-
-       
-        <Route path="/dashboard" element={<Dashboard />} />
-
-       
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Redirecionamentos */}
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

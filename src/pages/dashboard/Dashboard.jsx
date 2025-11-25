@@ -18,7 +18,7 @@ const Dashboard = () => {
     if (!token) {
       
       console.warn("Sem token! Redirecionando...");
-      navigate('/'); 
+      navigate('/login'); 
       return;
     }
 
@@ -34,7 +34,7 @@ const Dashboard = () => {
 
     } catch (error) {
       console.error("Erro ao ler token:", error);
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate]);
 
