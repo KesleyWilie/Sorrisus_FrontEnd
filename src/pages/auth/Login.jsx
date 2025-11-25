@@ -16,7 +16,27 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: ""
+  });
   const [rememberMe, setRememberMe] = useState(false);
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false
+  });
+
+  const validateEmail = (email) => {
+    if (!email) return "O e-mail é obrigatório";
+    if (!/\S+@\S+\.\S+/.test(email)) return "Digite um e-mail válido (exemplo@email.com)";
+    return "";
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "A senha é obrigatória";
+    if (password.length < 6) return "A senha deve ter no mínimo 6 caracteres";
+    return "";
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +45,25 @@ const Login = () => {
       [name]: value,
     }));
     setError("");
+
+    if (touched[name]) {
+      if (name === "email") {
+        setFieldErrors(prev => ({ ...prev, email: validateEmail(value) }));
+      } else if (name === "password") {
+        setFieldErrors(prev => ({ ...prev, password: validatePassword(value) }));
+      }
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+
+    if (name === "email") {
+      setFieldErrors(prev => ({ ...prev, email: validateEmail(value) }));
+    } else if (name === "password") {
+      setFieldErrors(prev => ({ ...prev, password: validatePassword(value) }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -89,7 +128,9 @@ const Login = () => {
                   E-mail
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Mail className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                    fieldErrors.email && touched.email ? 'text-red-500' : 'text-gray-400'
+                  }`} />
                   <input
                     id="email"
                     name="email"
@@ -97,11 +138,24 @@ const Login = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg transition-all outline-none ${
+                      fieldErrors.email && touched.email
+                        ? 'border-red-500 focus:ring-2 focus:ring-red-500 bg-red-50'
+                        : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                    }`}
                     placeholder="seu@email.com"
                     disabled={loading}
                   />
+                  {fieldErrors.email && touched.email && (
+                    <AlertCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                  )}
                 </div>
+                {fieldErrors.email && touched.email && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <span>•</span> {fieldErrors.email}
+                  </p>
+                )}
               </div>
 
               {/* Senha */}
@@ -110,7 +164,9 @@ const Login = () => {
                   Senha
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Lock className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                    fieldErrors.password && touched.password ? 'text-red-500' : 'text-gray-400'
+                  }`} />
                   <input
                     id="password"
                     name="password"
@@ -118,7 +174,12 @@ const Login = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    onBlur={handleBlur}
+                    className={`w-full pl-10 pr-12 py-3 border rounded-lg transition-all outline-none ${
+                      fieldErrors.password && touched.password
+                        ? 'border-red-500 focus:ring-2 focus:ring-red-500 bg-red-50'
+                        : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                    }`}
                     placeholder="••••••••"
                     disabled={loading}
                   />
@@ -131,6 +192,11 @@ const Login = () => {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {fieldErrors.password && touched.password && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <span>•</span> {fieldErrors.password}
+                  </p>
+                )}
               </div>
 
               {/* Lembrar-me e Esqueci senha */}
@@ -157,7 +223,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading || !formData.email || !formData.password}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2"
               >
                 {loading ? (
