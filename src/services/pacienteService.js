@@ -7,10 +7,24 @@ export const listarPacientes = () => api.get("/pacientes");
 export const cadastrarPaciente = (dados) => api.post("/pacientes/cadastro", dados);
 
 // atualizar paciente
-export const atualizarPaciente = (id, dados) => api.put(`/pacientes/${id}`, dados);
+export const atualizarPaciente = (id, dados) => {
+    const token = localStorage.getItem("accessToken");
+    return api.put(`/pacientes/${id}`, dados, { 
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
 
 // buscar por id
-export const buscarPacientePorId = (id) => api.get(`/pacientes/${id}`);
+export const buscarPacientePorId = (id) => {
+    const token = localStorage.getItem("accessToken"); 
+    return api.get(`/pacientes/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+}
 
 // deletar
 export const deletarPaciente = (id) => api.delete(`/pacientes/${id}`);
