@@ -59,7 +59,7 @@ const Navbar = () => {
                 <span className="font-medium">Pacientes</span>
               </Link>
               <Link
-                to="/dashboard"
+                to="/agendamentos"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <Calendar className="w-5 h-5" />

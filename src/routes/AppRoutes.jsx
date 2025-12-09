@@ -1,21 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import PrivateRoute from "../components/PrivateRoute";
-
-// Páginas
 import Login from "../pages/auth/Login.jsx";
 import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
+import Agendamento from "../pages/agendamento/Agendamento.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
-
-// Páginas de Perfis
 import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
-
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
-
-// Anamnese e odontograma
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
-
-// --- IMPORTAÇÃO NOVA ---
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
 
 export default function AppRoutes() {
@@ -44,8 +36,6 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
-          
-          {/* --- ROTA NOVA: Histórico de Consultas --- */}
           <Route
             path="/historico-consultas"
             element={
@@ -54,8 +44,6 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
-
-          {/* Rota de Anamnese e Odontograma */}
           <Route
             path="/dentista/anamnese/:consultaId"
             element={
@@ -64,8 +52,14 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
-
-          {/* Perfil unificado */}
+          <Route
+            path="/agendamentos"
+            element={
+              <PrivateRoute>
+                <Agendamento />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/perfil"
             element={

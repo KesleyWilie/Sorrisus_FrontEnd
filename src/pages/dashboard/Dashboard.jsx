@@ -135,8 +135,8 @@ const Dashboard = () => {
                 className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
             >
                 <Calendar className="w-8 h-8 mb-4 opacity-80" />
-                <h3 className="text-xl font-bold mb-1">Agendamentos</h3>
-                <p className="text-purple-100 text-sm">Visualizar histórico e consultas</p>
+                <h3 className="text-xl font-bold mb-1">Consultas</h3>
+                <p className="text-purple-100 text-sm">Visualizar histórico de consultas</p>
             </div>
 
         </div>
