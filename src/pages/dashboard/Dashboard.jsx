@@ -1,101 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
-import { botoesConfig } from './DashboardConfig';
-import LogoutModal from '../../components/LogoutModal'; 
+import React, { useEffect, useState } from "react";
+import Navbar from "../../components/Navbar";
+import { listarPacientes } from "../../services/pacienteService";
+import { listarDentistas } from "../../services/dentistaService";
+import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [userRole, setUserRole] = useState(null); 
-  const [userName, setUserName] = useState("");   
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [pacientesCount, setPacientesCount] = useState(null);
+  const [dentistasCount, setDentistasCount] = useState(null);
+  const [error, setError] = useState(null);
 
- 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (token) {
+    let mounted = true;
+    const fetchCounts = async () => {
       try {
-        const decoded = jwtDecode(token);
-        const roleDoToken = decoded.role || decoded.roles || decoded.authorities;
+        const [pRes, dRes] = await Promise.all([listarPacientes(), listarDentistas()]);
         
-        console.log("Perfil validado:", roleDoToken);
-        if (!roleDoToken) console.warn("Token sem role definida!");
+        if (!mounted) return;
+        
+        const getCount = (res) => {
+          if (!res || typeof res !== 'object') return 0;
+          const body = res.data;
+          if (Array.isArray(body)) return body.length;
+          if (body?.content && Array.isArray(body.content)) return body.content.length;
+          if (Array.isArray(body?.data)) return body.data.length;
+          if (typeof body?.totalElements === 'number') return body.totalElements;
+          if (typeof body?.total === 'number') return body.total;
+          if (typeof body?.length === 'number') return body.length;
+          return 0;
+        };
 
-        setUserRole(roleDoToken);
-        setUserName(decoded.sub || ""); 
-      
-      } catch (error) {
-        console.error("Erro token:", error);
-        localStorage.removeItem('token'); 
-        navigate('/'); 
+        setPacientesCount(getCount(pRes));
+        setDentistasCount(getCount(dRes));
+      } catch (err) {
+        console.error('Erro ao buscar contagens:', err);
+        if (!mounted) return;
+        setError('Erro ao carregar dados');
       }
-    } else {
-      console.warn("Sem token.");
-      navigate('/'); 
-    }
-  }, [navigate]);
+    };
 
- 
-  const handleLogoutConfirm = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-  };
-
-  
-  const buttonBaseClass = "bg-[#3a7ca5] hover:bg-[#2d6a88] text-white text-lg font-medium py-4 px-6 rounded-md shadow-sm transition-colors duration-200";
-  const headerLinkClass = "text-gray-500 hover:text-gray-700 cursor-not-allowed";
+    fetchCounts();
+    return () => { mounted = false; };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans relative">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
       
-      
-      <header className="flex justify-between items-center p-8 border-b border-gray-100">
-        <nav className="space-x-8 text-lg">
-          <span className={headerLinkClass}>Início</span>
-          <span className={headerLinkClass}>Meio</span>
-          <span className={headerLinkClass}>Fim</span>
-        </nav>
-        <div className="flex items-center gap-4">
-          {userName && <span className="text-gray-600 text-sm">Olá, {userName}</span>}
-          <button onClick={() => setShowLogoutModal(true)} className="bg-[#3a7ca5] hover:bg-[#2d6a88] text-white font-bold py-2 px-6 rounded">
-            Logout
-          </button>
-        </div>
-      </header>
-
-      
-      <main className="flex-grow flex flex-col items-center pt-16 pb-10 px-4">
-        <h1 className="text-5xl font-bold text-[#2c3e50] mb-16 drop-shadow-md">
-          Menu
-        </h1>
-
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 max-w-4xl w-full text-center">
-          {botoesConfig.map((botao, index) => {
-            if (userRole && botao.roles.includes(userRole)) {
-              return (
-                <button 
-                  key={index} 
-                  onClick={() => botao.action(navigate)} 
-                  className={buttonBaseClass}
-                >
-                  {botao.label}
-                </button>
-              );
-            }
-            return null;
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Pacientes</p>
+                <p className="text-2xl font-bold text-gray-800">{pacientesCount ?? "-"}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Consultas Hoje</p>
+                <p className="text-2xl font-bold text-gray-800">12</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Dentistas</p>
+                <p className="text-2xl font-bold text-gray-800">{dentistasCount ?? "-"}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <UserCog className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Taxa Ocupação</p>
+                <p className="text-2xl font-bold text-gray-800">87%</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
-
-      
-      <LogoutModal 
-        isOpen={showLogoutModal} 
-        onClose={() => setShowLogoutModal(false)} 
-        onConfirm={handleLogoutConfirm} 
-      />
-
     </div>
   );
 };

@@ -101,9 +101,7 @@ const Login = () => {
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
             <div className="flex items-center justify-center mb-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                </svg>
+                <img src="/teeth.png" alt="Sorrisus" className="w-10 h-10 object-contain" />
               </div>
             </div>
             <h1 className="text-3xl font-bold text-center">Sorrisus</h1>

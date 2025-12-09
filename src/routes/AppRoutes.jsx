@@ -6,7 +6,14 @@ import PrivateRoute from "../components/PrivateRoute";
 import Login from "../pages/auth/Login.jsx";
 import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
+
+// Páginas de Perfis
+import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
+
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
+
+// Anamnese e odontograma
+import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 
 export default function AppRoutes() {
   return (
@@ -31,6 +38,26 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* Rota de Anamnese e Odontograma */}
+          <Route
+            path="/dentista/anamnese/:idPaciente"
+            element={
+              <PrivateRoute>
+                <AnamneseOdontograma />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Perfil unificado */}
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <GerenciarPerfil />
               </PrivateRoute>
             }
           />
