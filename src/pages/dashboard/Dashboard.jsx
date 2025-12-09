@@ -47,7 +47,13 @@ const Dashboard = () => {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-       
+        
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">Visão geral do sistema Sorrisus</p>
+        </div>
+
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -97,8 +103,34 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+
+       
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+           
+            <div className="bg-blue-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+                <Users className="w-8 h-8 mb-4 opacity-80" />
+                <h3 className="text-xl font-bold mb-1">Pacientes</h3>
+                <p className="text-blue-100 text-sm">Gerenciar cadastro de pacientes</p>
+            </div>
+
+            
+            <div className="bg-green-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+                <UserCog className="w-8 h-8 mb-4 opacity-80" />
+                <h3 className="text-xl font-bold mb-1">Dentistas</h3>
+                <p className="text-green-100 text-sm">Gerenciar equipe odontológica</p>
+            </div>
+
+            
+            <div className="bg-purple-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+                <Calendar className="w-8 h-8 mb-4 opacity-80" />
+                <h3 className="text-xl font-bold mb-1">Agendamentos</h3>
+                <p className="text-purple-100 text-sm">Gerenciar consultas e horários</p>
+            </div>
 
         </div>
+
       </main>
     </div>
   );
