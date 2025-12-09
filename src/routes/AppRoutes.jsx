@@ -15,6 +15,9 @@ import Dashboard from "../pages/dashboard/Dashboard.jsx";
 // Anamnese e odontograma
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 
+// --- IMPORTAÇÃO NOVA ---
+import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
+
 export default function AppRoutes() {
   return (
     <AuthProvider>
@@ -42,6 +45,16 @@ export default function AppRoutes() {
             }
           />
           
+          {/* --- ROTA NOVA: Histórico de Consultas --- */}
+          <Route
+            path="/historico-consultas"
+            element={
+              <PrivateRoute>
+                <HistoricoConsultas />
+              </PrivateRoute>
+            }
+          />
+
           {/* Rota de Anamnese e Odontograma */}
           <Route
             path="/dentista/anamnese/:idPaciente"
