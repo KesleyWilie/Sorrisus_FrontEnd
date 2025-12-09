@@ -1,16 +1,16 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Stethoscope, FileText, Pill, Heart, AlertTriangle, MessageSquare, ClipboardList, Upload } from 'lucide-react';
+import { 
+    Stethoscope, FileText, Pill, Heart, AlertTriangle, MessageSquare, 
+    ClipboardList, ArrowLeft 
+} from 'lucide-react';
 import React from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { buscarConsultaPorId } from '../../services/consultaService';
-import { salvarProntuario } from '../../services/prontuarioService';
+import { salvarProntuario, buscarProntuarioPorConsulta } from '../../services/prontuarioService';
 import { buscarPacientePorId } from '../../services/pacienteService';
 
 // --- HELPER COMPONENTS ---
 
-/**
- * Componente de Input com Ícone Integrado
- */
 const InputIcon = ({ icon: Icon, placeholder, type, name, value, onChange, error, label, ...props }) => {
     const iconClasses = "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400";
     const inputClasses = `w-full pl-10 pr-3 py-2 border rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ${
@@ -35,9 +35,6 @@ const InputIcon = ({ icon: Icon, placeholder, type, name, value, onChange, error
     );
 };
 
-/**
- * Componente de Questão Sim/Não
- */
 const RadioQuestion = ({ name, question, value, onChange, Icon, notesPlaceholder }) => (
     <div className="flex flex-col space-y-2 border-b border-gray-200 py-3">
         <div className="flex items-center gap-3">
@@ -86,124 +83,110 @@ const RadioQuestion = ({ name, question, value, onChange, Icon, notesPlaceholder
 
 // --- ODONTOGRAMA LOGIC & COMPONENT ---
 
-// Definição das numerações dos dentes permanentes
 const permanentTeeth = [
-    ...[8, 7, 6, 5, 4, 3, 2, 1].map(n => ({ id: `1${n}`, quadrant: 'SUP DIR' })),
-    ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ id: `2${n}`, quadrant: 'SUP ESQ' })),
-    ...[8, 7, 6, 5, 4, 3, 2, 1].map(n => ({ id: `4${n}`, quadrant: 'INF DIR' })),
-    ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ id: `3${n}`, quadrant: 'INF ESQ' })),
+    ...[8, 7, 6, 5, 4, 3, 2, 1].map(n => ({ id: `1${n}`, quadrant: 'SUP DIR' })),
+    ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ id: `2${n}`, quadrant: 'SUP ESQ' })),
+    ...[8, 7, 6, 5, 4, 3, 2, 1].map(n => ({ id: `4${n}`, quadrant: 'INF DIR' })),
+    ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ id: `3${n}`, quadrant: 'INF ESQ' })),
 ];
 
-// Mapeamento de cores para as condições
 const conditionColors = {
-    healthy: 'fill-white stroke-gray-400',
-    decayed: 'fill-red-500 stroke-red-700', // Vermelho para cárie
-    missing: 'fill-gray-500 stroke-gray-700', // Cinza para dente ausente
-    treated: 'fill-green-500 stroke-green-700', // Verde para dente tratado/restaurado
+    healthy: 'fill-white stroke-gray-400',
+    decayed: 'fill-red-500 stroke-red-700',
+    missing: 'fill-gray-500 stroke-gray-700', 
+    treated: 'fill-green-500 stroke-green-700', 
 };
 
-/**
- * Representa um único dente no Odontograma.
- * Simplificado para mudar o estado (cor) ao ser clicado.
- */
 const Tooth = React.memo(({ id, condition, onConditionChange }) => {
-    // Estado possível: 'healthy', 'decayed', 'missing', 'treated'
-    const colors = conditionColors[condition] || conditionColors.healthy;
-    const isMissing = condition === 'missing';
+    const colors = conditionColors[condition] || conditionColors.healthy;
+    const isMissing = condition === 'missing';
 
-    const handleClick = () => {
-        const states = ['healthy', 'decayed', 'treated', 'missing'];
-        const currentIndex = states.indexOf(condition);
-        const nextIndex = (currentIndex + 1) % states.length;
-        onConditionChange(id, states[nextIndex]);
-    };
+    const handleClick = () => {
+        const states = ['healthy', 'decayed', 'treated', 'missing'];
+        const currentIndex = states.indexOf(condition);
+        const nextIndex = (currentIndex + 1) % states.length;
+        onConditionChange(id, states[nextIndex]);
+    };
 
-    return (
-        <div 
-            className={`flex flex-col items-center cursor-pointer transition-transform duration-150 hover:scale-105 mx-1 ${isMissing ? 'opacity-50' : ''}`}
-            onClick={handleClick}
-            title={`Dente ${id} - Clique para mudar o status: ${condition}`}
-        >
-            {/* Quadrado representando o dente (Simplificado) */}
-            <svg width="30" height="30" viewBox="0 0 30 30" className="flex-shrink-0">
-                <rect x="5" y="5" width="20" height="20" rx="4" className={`${colors} stroke-2`} />
-                {isMissing && (
-                    <>
-                        <line x1="5" y1="5" x2="25" y2="25" className="stroke-white stroke-2" />
-                        <line x1="25" y1="5" x2="5" y2="25" className="stroke-white stroke-2" />
-                    </>
-                )}
-            </svg>
-            {/* Numeração do dente */}
-            <span className="text-sm font-semibold text-gray-700 mt-1">{id}</span>
-        </div>
-    );
+    return (
+        <div 
+            className={`flex flex-col items-center cursor-pointer transition-transform duration-150 hover:scale-105 mx-1 ${isMissing ? 'opacity-50' : ''}`}
+            onClick={handleClick}
+            title={`Dente ${id} - Clique para mudar o status: ${condition}`}
+        >
+            <svg width="30" height="30" viewBox="0 0 30 30" className="flex-shrink-0">
+                <rect x="5" y="5" width="20" height="20" rx="4" className={`${colors} stroke-2`} />
+                {isMissing && (
+                    <>
+                        <line x1="5" y1="5" x2="25" y2="25" className="stroke-white stroke-2" />
+                        <line x1="25" y1="5" x2="5" y2="25" className="stroke-white stroke-2" />
+                    </>
+                )}
+            </svg>
+            <span className="text-sm font-semibold text-gray-700 mt-1">{id}</span>
+        </div>
+    );
 });
 
-/**
- * Odontograma completo (Apenas Dentes Permanentes)
- */
 const Odontogram = ({ odontogramState, onConditionChange }) => {
-    // Filtra e ordena os dentes para renderização (Maxilar Superior/Inferior, Direita/Esquerda)
-    const renderTeeth = useCallback((quadrants, isTop) => (
-        <div className={`flex justify-center w-full ${isTop ? 'flex-col' : 'flex-col-reverse'}`}>
-            <div className="flex justify-center">
-                {permanentTeeth
-                    .filter(t => t.quadrant === quadrants[0])
-                    .reverse() // Inverte para começar do 8
-                    .map(t => (
-                        <Tooth key={t.id} id={t.id} condition={odontogramState[t.id]} onConditionChange={onConditionChange} />
-                    ))}
-                {permanentTeeth
-                    .filter(t => t.quadrant === quadrants[1])
-                    .map(t => (
-                        <Tooth key={t.id} id={t.id} condition={odontogramState[t.id]} onConditionChange={onConditionChange} />
-                    ))}
-            </div>
-        </div>
-    ), [odontogramState, onConditionChange]);
+    const renderTeeth = useCallback((quadrants, isTop) => (
+        <div className={`flex justify-center w-full ${isTop ? 'flex-col' : 'flex-col-reverse'}`}>
+            <div className="flex justify-center">
+                {permanentTeeth
+                    .filter(t => t.quadrant === quadrants[0])
+                    .reverse() 
+                    .map(t => (
+                        <Tooth key={t.id} id={t.id} condition={odontogramState[t.id]} onConditionChange={onConditionChange} />
+                    ))}
+                {permanentTeeth
+                    .filter(t => t.quadrant === quadrants[1])
+                    .map(t => (
+                        <Tooth key={t.id} id={t.id} condition={odontogramState[t.id]} onConditionChange={onConditionChange} />
+                    ))}
+            </div>
+        </div>
+    ), [odontogramState, onConditionChange]);
 
-    return (
-        <div className="w-full">
-            <div className="flex justify-between text-sm font-bold text-gray-700 mb-2 mt-4 px-2">
-                <span>MAXILAR SUPERIOR</span>
-            </div>
-            {/* Quadrante Superior (10s e 20s) */}
-            {renderTeeth(['SUP DIR', 'SUP ESQ'], true)}
+    return (
+        <div className="w-full">
+            <div className="flex justify-between text-sm font-bold text-gray-700 mb-2 mt-4 px-2">
+                <span>MAXILAR SUPERIOR</span>
+            </div>
+            {renderTeeth(['SUP DIR', 'SUP ESQ'], true)}
 
-            {/* Linha Central */}
-            <div className="h-0.5 bg-gray-300 my-2 w-full"></div>
+            <div className="h-0.5 bg-gray-300 my-2 w-full"></div>
 
-            {/* Quadrante Inferior (40s e 30s) */}
-            <div className="flex justify-between text-sm font-bold text-gray-700 mb-2 mt-4 px-2">
-                <span>MAXILAR INFERIOR</span>
-            </div>
-            {renderTeeth(['INF DIR', 'INF ESQ'], false)}
+            <div className="flex justify-between text-sm font-bold text-gray-700 mb-2 mt-4 px-2">
+                <span>MAXILAR INFERIOR</span>
+            </div>
+            {renderTeeth(['INF DIR', 'INF ESQ'], false)}
 
-            {/* Legenda */}
-            <div className="mt-4 pt-3 border-t border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-700 mb-3">Legenda Odontograma</h4>
-                <div className="flex flex-wrap gap-4 text-sm font-medium">
-                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-white border border-gray-400 rounded-sm"></div> Saudável</div>
-                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-red-500 rounded-sm"></div> Cárie / Patologia</div>
-                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-500 rounded-sm"></div> Restaurado / Tratado</div>
-                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-gray-500 rounded-sm flex items-center justify-center"><div className="h-0.5 w-3 bg-white rotate-45"></div><div className="h-0.5 w-3 bg-white -rotate-45 absolute"></div></div> Ausente</div>
-                </div>
-            </div>
-        </div>
-    );
+            <div className="mt-4 pt-3 border-t border-gray-200">
+                <h4 className="text-lg font-semibold text-gray-700 mb-3">Legenda Odontograma</h4>
+                <div className="flex flex-wrap gap-4 text-sm font-medium">
+                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-white border border-gray-400 rounded-sm"></div> Saudável</div>
+                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-red-500 rounded-sm"></div> Cárie / Patologia</div>
+                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-500 rounded-sm"></div> Restaurado / Tratado</div>
+                    <div className="flex items-center gap-2"><div className="w-4 h-4 bg-gray-500 rounded-sm flex items-center justify-center"><div className="h-0.5 w-3 bg-white rotate-45"></div><div className="h-0.5 w-3 bg-white -rotate-45 absolute"></div></div> Ausente</div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 
 // --- MAIN COMPONENT ---
 
-    const AnamneseOdontograma = () => {
-    // 1. MUDANÇA: Pegamos o consultaId da URL, não o idPaciente
+const AnamneseOdontograma = () => {
     const { consultaId } = useParams();
+    const navigate = useNavigate();
 
-    // 2. MUDANÇA: Estado inicial preparado para receber dados da consulta
+    // Estados para mensagem de feedback
+    const [mensagem, setMensagem] = useState("");
+    const [tipoMensagem, setTipoMensagem] = useState("");
+
     const [anamnese, setAnamnese] = useState({
-        pacienteId: "", 
+        pacienteId: "",
         pacienteNome: "Carregando...",
         indicador: "",
         alergia: { resposta: "Não", notas: "" },
@@ -232,43 +215,87 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
         async function carregarDadosCompletos() {
             try {
                 const resConsulta = await buscarConsultaPorId(consultaId);
-                
                 const consulta = Array.isArray(resConsulta.data) ? resConsulta.data[0] : resConsulta.data;
-
-                console.log("Consulta carregada:", consulta);
-
+                
                 let nomePaciente = "Paciente não identificado";
+                let idPacienteEncontrado = "";
 
                 if (consulta.pacienteId) {
                     try {
                         const resPaciente = await buscarPacientePorId(consulta.pacienteId);
                         nomePaciente = resPaciente.data.nome;
+                        idPacienteEncontrado = consulta.pacienteId;
                     } catch (err) {
-                        console.error("Erro ao buscar detalhes do paciente:", err);
+                        console.error("Erro ao buscar paciente:", err);
                     }
                 }
 
-                setAnamnese((prev) => ({
+                setAnamnese(prev => ({
                     ...prev,
-                    pacienteId: consulta.pacienteId,
-                    pacienteNome: nomePaciente,
-                    
-                    observacoes: consulta.observacao || prev.observacoes,
-                    
-                    planoTratamento: consulta.prontuario?.planoTratamento || prev.planoTratamento,
+                    pacienteId: idPacienteEncontrado,
+                    pacienteNome: nomePaciente
                 }));
 
-                if (consulta.prontuario && consulta.prontuario.odontogramaJson) {
-                     try {
-                        setOdontogramState(JSON.parse(consulta.prontuario.odontogramaJson));
-                     } catch (e) {
-                        console.error("Erro ao ler odontograma salvo", e);
-                     }
+                try {
+                    const resProntuario = await buscarProntuarioPorConsulta(consultaId);
+                    const dados = resProntuario.data;
+
+                    console.log("Dados médicos carregados:", dados);
+
+                    setAnamnese(prev => ({
+                        ...prev,
+                        pacienteId: idPacienteEncontrado, 
+                        pacienteNome: nomePaciente,
+
+                        alergia: { 
+                            resposta: dados.alergiaResposta || "Não", 
+                            notas: dados.alergiaNotas || "" 
+                        },
+                        antibiotico: { 
+                            resposta: dados.antibioticoResposta || "Não", 
+                            notas: dados.antibioticoNotas || "" 
+                        },
+                        anestesico: { 
+                            resposta: dados.anestesicoResposta || "Não", 
+                            notas: dados.anestesicoNotas || "" 
+                        },
+                        sensibilidade: { 
+                            resposta: dados.sensibilidadeResposta || "Não", 
+                            notas: dados.sensibilidadeNotas || "" 
+                        },
+                        pressao: { 
+                            resposta: dados.pressaoResposta || "Não", 
+                            notas: dados.pressaoNotas || "" 
+                        },
+                        medicamento: { 
+                            resposta: dados.medicamentoResposta || "Não", 
+                            notas: dados.medicamentoNotas || "" 
+                        },
+                        problemaSaude: { 
+                            resposta: dados.problemaSaudeResposta || "Não", 
+                            notas: dados.problemaSaudeNotas || "" 
+                        },
+
+                        observacoes: dados.observacoes || "",
+                        planoTratamento: dados.planoTratamento || "",
+                    }));
+
+                    if (dados.odontogramaJson) {
+                         try {
+                            setOdontogramState(JSON.parse(dados.odontogramaJson));
+                         } catch (e) {
+                            console.error("Erro ao ler JSON do odontograma", e);
+                         }
+                    }
+
+                } catch (errProntuario) {
+                    console.log("Nenhum prontuário/anamnese prévio encontrado. Iniciando limpo.");
                 }
 
             } catch (error) {
-                console.error("Erro geral ao carregar dados:", error);
-                alert("Erro ao carregar os dados do atendimento.");
+                console.error("Erro crítico ao carregar tela:", error);
+                setMensagem("Erro ao carregar dados.");
+                setTipoMensagem("danger");
             }
         }
 
@@ -288,7 +315,6 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
                 },
             }));
         } else {
-            // Campo simples
             setAnamnese(prev => ({ ...prev, [name]: value }));
         }
     };
@@ -300,12 +326,17 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
         }));
     }, []);
 
-    // 5. MUDANÇA: handleSubmit enviando o consultaId correto
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Limpa mensagens anteriores
+        setMensagem("");
+        setTipoMensagem("");
+
         if (!consultaId) {
-            alert("Erro: ID da consulta não encontrado.");
+            setMensagem("Erro: ID da consulta não encontrado.");
+            setTipoMensagem("danger");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
@@ -332,22 +363,62 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
 
             await salvarProntuario(payload, consultaId);
 
-            alert("Anamnese registrada com sucesso!");
+            setMensagem("Anamnese e Prontuário salvos com sucesso!");
+            setTipoMensagem("success");
+            
+            // 1. SOBE O SCROLL PARA VER A MENSAGEM
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 2. AGUARDA 10 SEGUNDOS E REDIRECIONA
+            setTimeout(() => {
+                navigate('/historico-consultas');
+            }, 10000);
 
         } catch (error) {
             console.error(error);
-            alert("Erro ao salvar o prontuário.");
+            setMensagem("Erro ao salvar o prontuário. Tente novamente.");
+            setTipoMensagem("danger");
+            
+            // 1. SOBE O SCROLL PARA VER O ERRO
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 2. AGUARDA 10 SEGUNDOS E LIMPA A MENSAGEM
+            setTimeout(() => {
+                setMensagem("");
+                setTipoMensagem("");
+            }, 10000);
         }
     };
 
     return (
         <div className="min-h-screen bg-gray-50 flex justify-center py-10 px-4 font-sans">
-            <div className="w-full max-w-5xl bg-white shadow-2xl rounded-xl p-6 sm:p-10">
+            <div className="w-full max-w-5xl bg-white shadow-2xl rounded-xl p-6 sm:p-10 relative">
+                
+                {/* BOTÃO VOLTAR */}
+                <button 
+                    onClick={() => navigate(-1)} 
+                    className="flex items-center text-blue-600 hover:text-blue-800 transition-colors mb-4 font-medium"
+                >
+                    <ArrowLeft className="w-5 h-5 mr-2" />
+                    Voltar
+                </button>
+
                 <header className="text-center mb-8 pb-4 border-b-2 border-blue-500">
                     <ClipboardList className="w-10 h-10 text-blue-600 mx-auto mb-2" />
                     <h1 className="text-3xl font-extrabold text-gray-800">Ficha de Anamnese e Exame Clínico</h1>
                     <p className="text-gray-600 mt-2">Prontuário do Paciente: <span className="font-semibold">{anamnese.pacienteNome}</span></p>
                 </header>
+
+                {/* EXIBIÇÃO DE MENSAGENS (ERRO/SUCESSO) */}
+                {mensagem && (
+                    <div
+                        className={`mb-6 text-center py-3 rounded-lg text-white font-medium shadow-sm ${
+                            tipoMensagem === "success" ? "bg-green-600" : "bg-red-500"
+                        }`}
+                    >
+                        {mensagem}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-10">
 
@@ -359,9 +430,8 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Paciente</label>
-                                {/* Aqui o InputIcon não precisa de ícone, ajustado para manter o estilo */}
                                 <InputIcon 
-                                    icon={() => null} // Ícone vazio, remove o espaço
+                                    icon={() => null} 
                                     type="text" 
                                     name="pacienteNome" 
                                     value={anamnese.pacienteNome} 
@@ -373,7 +443,7 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Indicado por</label>
                                 <InputIcon 
-                                    icon={() => null} // Ícone vazio, remove o espaço
+                                    icon={() => null} 
                                     type="text" 
                                     name="indicador" 
                                     value={anamnese.indicador} 
@@ -452,7 +522,6 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
                             Odontograma (Dentição Permanente)
                         </h2>
                         
-                        {/* Componente Odontograma */}
                         <Odontogram 
                             odontogramState={odontogramState}
                             onConditionChange={handleOdontogramChange} 
@@ -493,11 +562,11 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
                     </section>
 
 
-                    {/* BOTÃO SALVAR */}
+                    {/* BOTÃO SALVAR (AZUL) */}
                     <div className="pt-4">
                         <button
                             type="submit"
-                            className="w-full py-3 bg-green-600 hover:bg-green-700 transition duration-200 text-white font-semibold rounded-lg shadow-lg shadow-green-500/30"
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 transition duration-200 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30"
                         >
                             Salvar Anamnese
                         </button>

@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import Navbar from "../../components/Navbar";
 import StatusBadge from "../../components/StatusBadge"; 
 import { formatarData } from "../../utils/formatters";  
-import { ArrowLeft, ClipboardList } from "lucide-react"; // MUDANÇA: Importado ClipboardList
+import { ArrowLeft, ClipboardList } from "lucide-react"; 
 
 
 const HistoricoConsultas = () => {

@@ -1,23 +1,11 @@
 import api from "./api";
 
 export const salvarProntuario = (dados, consultaId) => {
-  const token = localStorage.getItem("accessToken");
+  return api.post(`/prontuarios?consultaId=${consultaId}`, dados);
+};
 
-  const url = consultaId
-    ? `/prontuarios?consultaId=${consultaId}`
-    : `/prontuarios`;
-
-  return api.post(url, dados, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  /*return api.post(`/prontuarios?consultaId=${consultaId}`, dados, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });*/
+export const buscarProntuarioPorConsulta = (consultaId) => {
+  return api.get(`/prontuarios/consulta/${consultaId}`);
 };
 
 export const atualizarProntuario = (id, dados) => {
