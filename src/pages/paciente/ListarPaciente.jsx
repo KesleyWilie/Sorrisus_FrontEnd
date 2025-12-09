@@ -112,13 +112,6 @@ const Paciente = () => {
                           </button>
                           
                           <button
-                            onClick={() => criarAnamnese(p.id)}
-                            className="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors shadow-sm"
-                          >
-                            Criar Anamnese
-                          </button>
-                          
-                          <button
                             onClick={() => excluir(p.id)}
                             className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors shadow-sm"
                           >
