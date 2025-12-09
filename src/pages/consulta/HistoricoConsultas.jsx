@@ -1,0 +1,114 @@
+import { useEffect, useState } from "react";
+import { listarHistoricoPaciente, listarHistoricoDentista } from "../../services/consultaService";
+import { jwtDecode } from "jwt-decode";
+import Navbar from "../../components/Navbar";
+import StatusBadge from "../../components/StatusBadge"; 
+import { formatarData } from "../../utils/formatters";  
+
+const HistoricoConsultas = () => {
+  const [consultas, setConsultas] = useState([]);
+  const [userRole, setUserRole] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const carregarConsultas = async () => {
+      try {
+        const tokenReal = localStorage.getItem("token"); 
+        if (!tokenReal) return;
+
+        const decoded = jwtDecode(tokenReal);
+        const role = decoded.role || decoded.roles || decoded.authorities;
+        setUserRole(role);
+
+        const idParaBusca = decoded.userId || localStorage.getItem("userId"); 
+
+        if (!idParaBusca) {
+            setLoading(false);
+            return;
+        }
+
+        let data = [];
+        if (role === "ROLE_PACIENTE" || role === "PACIENTE") {
+             const res = await listarHistoricoPaciente(idParaBusca);
+             data = res.data;
+        } else if (role === "ROLE_DENTISTA" || role === "DENTISTA") {
+             const res = await listarHistoricoDentista(idParaBusca);
+             data = res.data;
+        }
+        setConsultas(data);
+      } catch (error) {
+        console.error("Erro ao carregar histórico:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarConsultas();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">Histórico de Consultas</h2>
+        </div>
+
+        <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data/Hora</th>
+                
+                {userRole && userRole.includes("PACIENTE") ? (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dentista</th>
+                ) : (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                )}
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observação</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr><td colSpan="4" className="text-center py-4">Carregando...</td></tr>
+              ) : consultas.length === 0 ? (
+                <tr>
+                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                        Nenhuma consulta encontrada.
+                    </td>
+                </tr>
+              ) : (
+                consultas.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                       
+                        {formatarData(c.dataHora)}
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                         {userRole && userRole.includes("PACIENTE") ? c.nomeDentista : c.nomePaciente}
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap">
+                        
+                        <StatusBadge status={c.status} />
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={c.observacao}>
+                        {c.observacao || "-"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HistoricoConsultas;

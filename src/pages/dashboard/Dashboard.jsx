@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import Navbar from "../../components/Navbar";
 import { listarPacientes } from "../../services/pacienteService";
 import { listarDentistas } from "../../services/dentistaService";
 import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
+  const navigate = useNavigate(); 
   const [pacientesCount, setPacientesCount] = useState(null);
   const [dentistasCount, setDentistasCount] = useState(null);
   const [error, setError] = useState(null);
@@ -53,7 +55,7 @@ const Dashboard = () => {
             <p className="text-gray-600">Visão geral do sistema Sorrisus</p>
         </div>
 
-        
+       
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -105,28 +107,36 @@ const Dashboard = () => {
           </div>
         </div>
 
-       
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-           
-            <div className="bg-blue-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+            
+            <div 
+                onClick={() => navigate("/pacientes")}
+                className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
+            >
                 <Users className="w-8 h-8 mb-4 opacity-80" />
                 <h3 className="text-xl font-bold mb-1">Pacientes</h3>
                 <p className="text-blue-100 text-sm">Gerenciar cadastro de pacientes</p>
             </div>
 
             
-            <div className="bg-green-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+            <div 
+                className="bg-green-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-80"
+            >
                 <UserCog className="w-8 h-8 mb-4 opacity-80" />
                 <h3 className="text-xl font-bold mb-1">Dentistas</h3>
-                <p className="text-green-100 text-sm">Gerenciar equipe odontológica</p>
+                <p className="text-green-100 text-sm">Em breve...</p>
             </div>
 
-            
-            <div className="bg-purple-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-90">
+          
+            <div 
+                onClick={() => navigate("/historico-consultas")}
+                className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
+            >
                 <Calendar className="w-8 h-8 mb-4 opacity-80" />
                 <h3 className="text-xl font-bold mb-1">Agendamentos</h3>
-                <p className="text-purple-100 text-sm">Gerenciar consultas e horários</p>
+                <p className="text-purple-100 text-sm">Visualizar histórico e consultas</p>
             </div>
 
         </div>
