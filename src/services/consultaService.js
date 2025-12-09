@@ -5,27 +5,33 @@ export const criarConsulta = (dados) => {
 };
 
 export const atualizarConsulta = (id, dados) => {
+ 
   return api.put(`/consultas/${id}`, dados);
 };
 
 export const alterarStatusConsulta = (id, status) => {
+  
   return api.patch(`/consultas/${id}/status`, null, {
     params: { status }
   });
 };
 
 export const cancelarConsulta = (id) => {
+
   return api.delete(`/consultas/${id}`);
 };
 
 export const listarConsultasPorPaciente = (pacienteId) => {
+ 
   return api.get(`/consultas/paciente/${pacienteId}`);
 };
 
 export const listarConsultasPorDentista = (dentistaId) => {
+  
   return api.get(`/consultas/dentista/${dentistaId}`);
 };
 
 export const buscarConsultaPorId = (id) => {
+ 
   return api.get(`/consultas/${id}`);
 };

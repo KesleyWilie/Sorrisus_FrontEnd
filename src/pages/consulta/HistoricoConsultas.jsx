@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { listarHistoricoPaciente, listarHistoricoDentista } from "../../services/consultaService";
+import { useNavigate } from "react-router-dom"; 
+import { listarConsultasPorPaciente, listarConsultasPorDentista } from "../../services/consultaService";
 import { jwtDecode } from "jwt-decode";
 import Navbar from "../../components/Navbar";
 import StatusBadge from "../../components/StatusBadge"; 
-import { formatarData } from "../../utils/formatters";  
+import { formatarData } from "../../utils/formatters";  
+import { ArrowLeft } from "lucide-react"; 
+
 
 const HistoricoConsultas = () => {
+  const navigate = useNavigate(); 
   const [consultas, setConsultas] = useState([]);
   const [userRole, setUserRole] = useState("");
   const [loading, setLoading] = useState(true);
@@ -28,11 +32,12 @@ const HistoricoConsultas = () => {
         }
 
         let data = [];
+        
         if (role === "ROLE_PACIENTE" || role === "PACIENTE") {
-             const res = await listarHistoricoPaciente(idParaBusca);
+             const res = await listarConsultasPorPaciente(idParaBusca);
              data = res.data;
         } else if (role === "ROLE_DENTISTA" || role === "DENTISTA") {
-             const res = await listarHistoricoDentista(idParaBusca);
+             const res = await listarConsultasPorDentista(idParaBusca);
              data = res.data;
         }
         setConsultas(data);
@@ -51,8 +56,17 @@ const HistoricoConsultas = () => {
       <Navbar />
       
       <div className="container mx-auto p-6">
+        
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">Histórico de Consultas</h2>
+          
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
+          >
+            <ArrowLeft size={18} />
+            Voltar
+          </button>
         </div>
 
         <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
@@ -84,7 +98,7 @@ const HistoricoConsultas = () => {
                 consultas.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                       
+                        
                         {formatarData(c.dataHora)}
                     </td>
                     
