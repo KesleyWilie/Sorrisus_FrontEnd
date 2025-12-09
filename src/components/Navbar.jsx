@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Home, Users, Calendar, Power } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { LogOut, User, Home, Users, Calendar, Power, ClipboardList } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -41,6 +41,16 @@ const Navbar = () => {
                 <Home className="w-5 h-5" />
                 <span className="font-medium">Dashboard</span>
               </Link>
+
+              {/* ANAMNESE 
+              <Link
+                to="/dentista/anamnese"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+              >
+                <ClipboardList className="w-5 h-5" />
+                <span className="font-medium">Anamnese</span>
+              </Link>*/}
+
               <Link
                 to="/pacientes"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"

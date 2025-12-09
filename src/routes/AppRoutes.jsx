@@ -12,6 +12,9 @@ import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
 
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
+// Anamnese e odontograma
+import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
+
 export default function AppRoutes() {
   return (
     <AuthProvider>
@@ -35,6 +38,16 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* Rota de Anamnese e Odontograma */}
+          <Route
+            path="/dentista/anamnese/:idPaciente"
+            element={
+              <PrivateRoute>
+                <AnamneseOdontograma />
               </PrivateRoute>
             }
           />

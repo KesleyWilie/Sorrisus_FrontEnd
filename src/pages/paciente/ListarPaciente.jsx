@@ -73,6 +73,14 @@ const Paciente = () => {
                   >
                     Editar
                   </button>
+
+                  <button
+                    onClick={() => navigate(`/dentista/anamnese/${p.id}`)}
+                    className="mr-2 px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                  >
+                    Criar Anamnese
+                  </button>
+
                   <button
                     onClick={() => excluir(p.id)}
                     className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-sm"
