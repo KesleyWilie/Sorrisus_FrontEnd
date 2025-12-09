@@ -44,7 +44,7 @@ export default function AppRoutes() {
           
           {/* Rota de Anamnese e Odontograma */}
           <Route
-            path="/dentista/anamnese/:idPaciente"
+            path="/dentista/anamnese/:consultaId"
             element={
               <PrivateRoute>
                 <AnamneseOdontograma />

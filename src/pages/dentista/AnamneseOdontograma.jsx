@@ -2,8 +2,9 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Stethoscope, FileText, Pill, Heart, AlertTriangle, MessageSquare, ClipboardList, Upload } from 'lucide-react';
 import React from 'react';
 import { useParams } from "react-router-dom";
-import { buscarPacientePorId } from '../../services/pacienteService';
+import { buscarConsultaPorId } from '../../services/consultaService';
 import { salvarProntuario } from '../../services/prontuarioService';
+import { buscarPacientePorId } from '../../services/pacienteService';
 
 // --- HELPER COMPONENTS ---
 
@@ -196,15 +197,15 @@ const Odontogram = ({ odontogramState, onConditionChange }) => {
 
 // --- MAIN COMPONENT ---
 
-const AnamneseOdontograma = () => {
-    const { idPaciente, consultaId } = useParams();
+    const AnamneseOdontograma = () => {
+    // 1. MUDANÇA: Pegamos o consultaId da URL, não o idPaciente
+    const { consultaId } = useParams();
 
+    // 2. MUDANÇA: Estado inicial preparado para receber dados da consulta
     const [anamnese, setAnamnese] = useState({
-        // Campos de identificação (seriam preenchidos automaticamente via ID do paciente)
-        pacienteId: idPaciente,
-        pacienteNome: "Carregando...", // Será atualizado no useEffect
+        pacienteId: "", 
+        pacienteNome: "Carregando...",
         indicador: "",
-        // Perguntas de Anamnese
         alergia: { resposta: "Não", notas: "" },
         antibiotico: { resposta: "Não", notas: "" },
         anestesico: { resposta: "Não", notas: "" },
@@ -216,29 +217,6 @@ const AnamneseOdontograma = () => {
         planoTratamento: "",
     });
 
-    useEffect(() => {
-        console.log("ID recebido:", idPaciente);
-
-        async function carregarDados() {
-            try {
-                const paciente = await buscarPacientePorId(idPaciente);
-                console.log("Paciente carregado:", paciente.data);
-
-                // atualiza o nome no estado da anamnese
-                setAnamnese((prev) => ({
-                    ...prev,
-                    pacienteNome: paciente.data.nome
-                }));
-
-            } catch (error) {
-                console.error("Erro ao buscar paciente pelo ID:", error);
-            }
-        }
-
-        carregarDados();
-    }, [idPaciente]);
-
-    // Estado do Odontograma (Inicializa todos como saudáveis)
     const initialOdontogramState = useMemo(() => {
         return permanentTeeth.reduce((acc, tooth) => {
             acc[tooth.id] = 'healthy';
@@ -248,12 +226,60 @@ const AnamneseOdontograma = () => {
 
     const [odontogramState, setOdontogramState] = useState(initialOdontogramState);
 
+    useEffect(() => {
+        if (!consultaId) return;
+
+        async function carregarDadosCompletos() {
+            try {
+                const resConsulta = await buscarConsultaPorId(consultaId);
+                
+                const consulta = Array.isArray(resConsulta.data) ? resConsulta.data[0] : resConsulta.data;
+
+                console.log("Consulta carregada:", consulta);
+
+                let nomePaciente = "Paciente não identificado";
+
+                if (consulta.pacienteId) {
+                    try {
+                        const resPaciente = await buscarPacientePorId(consulta.pacienteId);
+                        nomePaciente = resPaciente.data.nome;
+                    } catch (err) {
+                        console.error("Erro ao buscar detalhes do paciente:", err);
+                    }
+                }
+
+                setAnamnese((prev) => ({
+                    ...prev,
+                    pacienteId: consulta.pacienteId,
+                    pacienteNome: nomePaciente,
+                    
+                    observacoes: consulta.observacao || prev.observacoes,
+                    
+                    planoTratamento: consulta.prontuario?.planoTratamento || prev.planoTratamento,
+                }));
+
+                if (consulta.prontuario && consulta.prontuario.odontogramaJson) {
+                     try {
+                        setOdontogramState(JSON.parse(consulta.prontuario.odontogramaJson));
+                     } catch (e) {
+                        console.error("Erro ao ler odontograma salvo", e);
+                     }
+                }
+
+            } catch (error) {
+                console.error("Erro geral ao carregar dados:", error);
+                alert("Erro ao carregar os dados do atendimento.");
+            }
+        }
+
+        carregarDadosCompletos();
+    }, [consultaId]);
+
     const handleAnamneseChange = (e) => {
         const { name, value } = e.target;
         const parts = name.split('.');
 
         if (parts.length === 2) {
-            // Campo de sub-objeto (alergia.resposta ou alergia.notas)
             setAnamnese(prev => ({
                 ...prev,
                 [parts[0]]: {
@@ -268,53 +294,45 @@ const AnamneseOdontograma = () => {
     };
 
     const handleOdontogramChange = useCallback((toothId, newCondition) => {
-        setOdontogramState(prev => ({
-            ...prev,
-            [toothId]: newCondition,
-        }));
-    }, []);
+        setOdontogramState(prev => ({
+            ...prev,
+            [toothId]: newCondition,
+        }));
+    }, []);
 
+    // 5. MUDANÇA: handleSubmit enviando o consultaId correto
     const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (!odontogramState) {
-        console.error("ERRO: odontogramState não existe");
-        return;
-    }
+        if (!consultaId) {
+            alert("Erro: ID da consulta não encontrado.");
+            return;
+        }
 
-    try {
-        const payload = {
-        alergiaResposta: anamnese.alergia.resposta,
-        alergiaNotas: anamnese.alergia.notas,
+        try {
+            const payload = {
+                alergiaResposta: anamnese.alergia.resposta,
+                alergiaNotas: anamnese.alergia.notas,
+                antibioticoResposta: anamnese.antibiotico.resposta,
+                antibioticoNotas: anamnese.antibiotico.notas,
+                anestesicoResposta: anamnese.anestesico.resposta,
+                anestesicoNotas: anamnese.anestesico.notas,
+                sensibilidadeResposta: anamnese.sensibilidade.resposta,
+                sensibilidadeNotas: anamnese.sensibilidade.notas,
+                pressaoResposta: anamnese.pressao.resposta,
+                pressaoNotas: anamnese.pressao.notas,
+                medicamentoResposta: anamnese.medicamento.resposta,
+                medicamentoNotas: anamnese.medicamento.notas,
+                problemaSaudeResposta: anamnese.problemaSaude.resposta,
+                problemaSaudeNotas: anamnese.problemaSaude.notas,
+                observacoes: anamnese.observacoes,
+                planoTratamento: anamnese.planoTratamento,
+                odontogramaJson: JSON.stringify(odontogramState),
+            };
 
-        antibioticoResposta: anamnese.antibiotico.resposta,
-        antibioticoNotas: anamnese.antibiotico.notas,
+            await salvarProntuario(payload, consultaId);
 
-        anestesicoResposta: anamnese.anestesico.resposta,
-        anestesicoNotas: anamnese.anestesico.notas,
-
-        sensibilidadeResposta: anamnese.sensibilidade.resposta,
-        sensibilidadeNotas: anamnese.sensibilidade.notas,
-
-        pressaoResposta: anamnese.pressao.resposta,
-        pressaoNotas: anamnese.pressao.notas,
-
-        medicamentoResposta: anamnese.medicamento.resposta,
-        medicamentoNotas: anamnese.medicamento.notas,
-
-        problemaSaudeResposta: anamnese.problemaSaude.resposta,
-        problemaSaudeNotas: anamnese.problemaSaude.notas,
-
-        observacoes: anamnese.observacoes,
-        planoTratamento: anamnese.planoTratamento,
-
-        odontogramaJson: JSON.stringify(odontogramState),
-        };
-
-        // consultaId vem da URL ou do estado
-        await salvarProntuario(payload, consultaId ?? null);
-
-        alert("Anamnese registrada com sucesso!");
+            alert("Anamnese registrada com sucesso!");
 
         } catch (error) {
             console.error(error);
