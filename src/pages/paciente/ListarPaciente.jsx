@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { listarPacientes, deletarPaciente } from "../../services/pacienteService";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar"; // Adicionado para consistência visual
-import { ArrowLeft, Plus } from "lucide-react"; // Adicionado para consistência visual
+import Navbar from "../../components/Navbar";
+import { ArrowLeft, Plus } from "lucide-react";
 
 const Paciente = () => {
   const [pacientes, setPacientes] = useState([]);
-  const [loading, setLoading] = useState(true); // Adicionado estado de loading
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const carregarPacientes = async () => {
@@ -16,7 +16,6 @@ const Paciente = () => {
       setPacientes(response.data);
     } catch (error) {
       console.error("Erro ao listar pacientes:", error);
-      // Opcional: Adicionar tratamento de erro na interface, se necessário
     } finally {
       setLoading(false);
     }
@@ -29,7 +28,7 @@ const Paciente = () => {
         carregarPacientes();
       } catch (error) {
         console.error("Erro ao excluir paciente:", error);
-        alert("Erro ao excluir paciente. Verifique se há consultas vinculadas."); // Feedback de erro
+        alert("Erro ao excluir paciente. Verifique se há consultas vinculadas.");
       }
     }
   };
@@ -106,7 +105,7 @@ const Paciente = () => {
                       <div className="flex justify-center space-x-2">
                           <button
                             onClick={() => editar(p.id)}
-                            className="px-3 py-1 rounded bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-medium transition-colors shadow-sm"
+                            className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors shadow-sm"
                           >
                             Editar
                           </button>
