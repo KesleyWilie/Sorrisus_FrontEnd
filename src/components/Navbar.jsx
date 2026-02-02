@@ -41,16 +41,6 @@ const Navbar = () => {
                 <Home className="w-5 h-5" />
                 <span className="font-medium">Dashboard</span>
               </Link>
-
-              {/* ANAMNESE 
-              <Link
-                to="/dentista/anamnese"
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
-              >
-                <ClipboardList className="w-5 h-5" />
-                <span className="font-medium">Anamnese</span>
-              </Link>*/}
-
               <Link
                 to="/pacientes"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
@@ -64,6 +54,14 @@ const Navbar = () => {
               >
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">Agendamentos</span>
+              </Link>
+              { /* Portfólio de Serviços */}
+              <Link
+                to="/servicos"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+              >
+                <ClipboardList className="w-5 h-5" />
+                <span className="font-medium">Procedimentos</span>
               </Link>
             </div>
 

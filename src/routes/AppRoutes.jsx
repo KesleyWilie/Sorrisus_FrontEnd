@@ -9,6 +9,7 @@ import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
+import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
 
 export default function AppRoutes() {
   return (
@@ -27,6 +28,14 @@ export default function AppRoutes() {
                 <Dashboard />
               </PrivateRoute>
             }
+          />
+          <Route 
+            path="/servicos" 
+            element={
+              <PrivateRoute>
+                <VisualizarPortfolio />
+              </PrivateRoute>
+            } 
           />
           <Route
             path="/pacientes"
