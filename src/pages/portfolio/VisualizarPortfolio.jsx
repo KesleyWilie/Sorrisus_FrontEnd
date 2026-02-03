@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Clock, CheckCircle2, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { listarServicos } from '../../services/servicoService';
 import { useNavigate } from "react-router-dom";
+import Navbar from "../../components/Navbar";
 
 const VisualizarPortfolio = () => {
     const [servicos, setServicos] = useState([]);
@@ -52,6 +53,7 @@ const VisualizarPortfolio = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12">
+            <Navbar />
             {/* Header com Gradiente */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 pt-16 pb-24 px-4">
                 <div className="max-w-6xl mx-auto text-center">
