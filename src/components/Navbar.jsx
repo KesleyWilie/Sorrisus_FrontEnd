@@ -1,12 +1,19 @@
+import { useAuth } from "../context/AuthContext.jsx"; import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut, User, Home, Users, Calendar, Power, ClipboardList, Info } from "lucide-react";
-import { useAuth } from "../context/AuthContext.jsx";
 import { useState } from "react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const dashboardPath = useMemo(() => {
+    if (!user || !user.role) return "/login";
+    const role = String(user.role).toUpperCase();
+    if (role.includes("PACIENTE")) return "/dashboard-paciente";
+    return "/dashboard-dentista";
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -33,15 +40,15 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-3">
-              <img src="sorrisus.png" alt="Sorrisus" className="w-10 h-10 rounded-lg object-contain" />
+            <Link to={dashboardPath} className="flex items-center gap-3">
+              <img src="/sorrisus.png" alt="Sorrisus" className="w-10 h-10 rounded-lg object-contain" />
               <span className="text-xl font-bold text-white">Sorrisus</span>
             </Link>
 
             {/* Menu */}
             <div className="hidden md:flex items-center gap-6">
               <Link
-                to="/dashboard"
+                to={dashboardPath}
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <Home className="w-5 h-5" />

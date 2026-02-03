@@ -7,7 +7,7 @@ import EditarPaciente from "../pages/paciente/EditarPaciente.jsx";
 import Agendamento from "../pages/agendamento/Agendamento.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
 import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
-import Dashboard from "../pages/dashboard/Dashboard.jsx";
+import Dashboard from "../pages/dashboard/DashboardDentista.jsx";
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
 import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
@@ -18,6 +18,8 @@ import EditarServico from "../pages/servico/EditarServico.jsx";
 
 import SobreNos from "../pages/SobreNos.jsx";
 import NovoPaciente from "../pages/paciente/NovoPaciente.jsx";
+import DashboardPaciente from "../pages/dashboard/DashboardPaciente.jsx";
+import DashboardRedirect from "./DashboardRedirect.jsx";
 
 export default function AppRoutes() {
   return (
@@ -30,10 +32,18 @@ export default function AppRoutes() {
 
           {/* Rotas Privadas */}
           <Route
-            path="/dashboard"
+            path="/dashboard-dentista"
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard-paciente"
+            element={
+              <PrivateRoute>
+                <DashboardPaciente />
               </PrivateRoute>
             }
           />
@@ -86,7 +96,6 @@ export default function AppRoutes() {
             }
           />
 
-          {/* Agendamentos */}
           <Route
             path="/agendamentos"
             element={
@@ -155,9 +164,8 @@ export default function AppRoutes() {
             }
           />
 
-          {/* Redirecionamentos */}
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<DashboardRedirect />} />
+          <Route path="*" element={<DashboardRedirect />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

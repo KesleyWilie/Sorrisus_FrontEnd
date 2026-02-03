@@ -80,7 +80,13 @@ const Login = () => {
         role: response.role
       });
 
-      navigate("/dashboard");
+      if (response.role === "ROLE_PACIENTE" || response.role === "PACIENTE") {
+        navigate("/dashboard-paciente");
+        return;
+      } else if (response.role === "ROLE_DENTISTA" || response.role === "DENTISTA") {
+        navigate("/dashboard-dentista");
+        return;
+      }
     } catch (err) {
       console.error("Erro ao fazer login:", err);
       setError(

@@ -1,9 +1,10 @@
+// src/pages/dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import { listarPacientes } from "../../services/pacienteService";
-import { listarDentistas } from "../../services/dentistaService";
-import { listarConsultasPorDentista } from "../../services/consultaService";
+import Navbar from "../../components/Navbar.jsx";
+import { listarPacientes } from "../../services/pacienteService.js";
+import { listarDentistas } from "../../services/dentistaService.js";
+import { listarConsultasPorDentista } from "../../services/consultaService.js";
 import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
@@ -14,12 +15,6 @@ const Dashboard = () => {
   const [dentistasCount, setDentistasCount] = useState(null);
   const [consultasCount, setConsultasCount] = useState(null);
   const [error, setError] = useState(null);
-
-  const isPaciente = () => {
-    if (!user || !user.role) return false;
-    const role = String(user.role).toUpperCase();
-    return role === "ROLE_PACIENTE" || role === "PACIENTE";
-  };
 
   const getCurrentUserId = () => {
     if (user?.id) return user.id;
@@ -34,6 +29,7 @@ const Dashboard = () => {
         if (parsed?.userId) return parsed.userId;
       }
     } catch (e) {
+      // ignore
     }
     return null;
   };
@@ -153,27 +149,23 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {!isPaciente() && (
-            <div
-              onClick={() => navigate("/pacientes")}
-              className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
-            >
-              <Users className="w-8 h-8 mb-4 opacity-80" />
-              <h3 className="text-xl font-bold mb-1">Pacientes</h3>
-              <p className="text-blue-100 text-sm">Gerenciar cadastro de pacientes</p>
-            </div>
-          )}
+          <div
+            onClick={() => navigate("/pacientes")}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
+          >
+            <Users className="w-8 h-8 mb-4 opacity-80" />
+            <h3 className="text-xl font-bold mb-1">Pacientes</h3>
+            <p className="text-blue-100 text-sm">Gerenciar cadastro de pacientes</p>
+          </div>
 
-          {!isPaciente() && (
-            <div
-              onClick={() => navigate("/servicos")}
-              className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
-            >
-              <UserCog className="w-8 h-8 mb-4 opacity-80" />
-              <h3 className="text-xl font-bold mb-1">Serviços</h3>
-              <p className="text-green-100 text-sm">Gerenciar serviços disponíveis</p>
-            </div>
-          )}
+          <div
+            onClick={() => navigate("/servicos")}
+            className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
+          >
+            <UserCog className="w-8 h-8 mb-4 opacity-80" />
+            <h3 className="text-xl font-bold mb-1">Serviços</h3>
+            <p className="text-green-100 text-sm">Gerenciar serviços disponíveis</p>
+          </div>
 
           <div
             onClick={() => navigate("/historico-consultas")}
