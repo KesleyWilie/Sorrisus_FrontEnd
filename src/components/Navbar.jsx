@@ -57,7 +57,7 @@ const Navbar = () => {
               </Link>
               { /* Portfólio de Serviços */}
               <Link
-                to="/servicos"
+                to="/portfolio"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
               >
                 <ClipboardList className="w-5 h-5" />
