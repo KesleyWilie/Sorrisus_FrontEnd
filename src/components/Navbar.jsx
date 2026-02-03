@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Home, Users, Calendar, Power, ClipboardList } from "lucide-react";
+import { LogOut, User, Home, Users, Calendar, Power, ClipboardList, Info } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useState } from "react";
 
@@ -62,6 +62,14 @@ const Navbar = () => {
               >
                 <ClipboardList className="w-5 h-5" />
                 <span className="font-medium">Procedimentos</span>
+              </Link>
+              { /* Sobre Nós */}
+              <Link
+                to="/sobre-nos"
+                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+              >
+                <Info className="w-5 h-5" />
+                <span className="font-medium">Sobre Nós</span>
               </Link>
             </div>
 

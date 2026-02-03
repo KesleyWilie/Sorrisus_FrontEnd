@@ -11,6 +11,7 @@ import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
 import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
 import NovoAgendamento from "../pages/agendamento/NovoAgendamento.jsx"; import EditarAgendamento from "../pages/agendamento/EditarAgendamento.jsx";
+import SobreNos from "../pages/SobreNos.jsx";
 
 export default function AppRoutes() {
   return (
@@ -85,6 +86,15 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <EditarAgendamento />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/sobre-nos"
+            element={
+              <PrivateRoute>
+                <SobreNos />
               </PrivateRoute>
             }
           />
