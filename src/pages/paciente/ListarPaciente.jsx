@@ -85,7 +85,7 @@ const Paciente = () => {
               Voltar
             </button>
             <button
-              onClick={() => navigate("/pacientes/cadastrar")}
+              onClick={() => navigate("/pacientes/cadastrar/interno")}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-md font-medium"
             >
               <Plus size={18} />

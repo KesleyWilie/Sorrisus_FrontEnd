@@ -17,6 +17,7 @@ import NovoServico from "../pages/servico/NovoServico.jsx";
 import EditarServico from "../pages/servico/EditarServico.jsx";
 
 import SobreNos from "../pages/SobreNos.jsx";
+import NovoPaciente from "../pages/paciente/NovoPaciente.jsx";
 
 export default function AppRoutes() {
   return (
@@ -49,6 +50,14 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pacientes/cadastrar/interno"
+            element={
+              <PrivateRoute>
+                <NovoPaciente />
               </PrivateRoute>
             }
           />
