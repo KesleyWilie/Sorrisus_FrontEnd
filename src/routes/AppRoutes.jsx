@@ -10,6 +10,7 @@ import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
 import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
+import NovoAgendamento from "../pages/agendamento/NovoAgendamento.jsx"; import EditarAgendamento from "../pages/agendamento/EditarAgendamento.jsx";
 
 export default function AppRoutes() {
   return (
@@ -29,13 +30,13 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
-          <Route 
-            path="/servicos" 
+          <Route
+            path="/servicos"
             element={
               <PrivateRoute>
                 <VisualizarPortfolio />
               </PrivateRoute>
-            } 
+            }
           />
           <Route
             path="/pacientes"
@@ -61,6 +62,8 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
+
+          {/* Agendamentos */}
           <Route
             path="/agendamentos"
             element={
@@ -69,6 +72,23 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/agendamentos/novo"
+            element={
+              <PrivateRoute>
+                <NovoAgendamento />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/agendamentos/editar/:id"
+            element={
+              <PrivateRoute>
+                <EditarAgendamento />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/perfil"
             element={
@@ -80,7 +100,7 @@ export default function AppRoutes() {
 
           {/* Redirecionamentos */}
           <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

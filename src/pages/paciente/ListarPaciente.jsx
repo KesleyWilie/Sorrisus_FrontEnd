@@ -2,34 +2,61 @@ import { useEffect, useState } from "react";
 import { listarPacientes, deletarPaciente } from "../../services/pacienteService";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import ConfirmModal from "../../components/ConfirmModal";
+import Toast from "../../components/Toast";
 import { ArrowLeft, Plus } from "lucide-react";
 
 const Paciente = () => {
   const [pacientes, setPacientes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPaciente, setSelectedPaciente] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [toast, setToast] = useState({ type: null, message: null });
+
   const navigate = useNavigate();
 
   const carregarPacientes = async () => {
     setLoading(true);
     try {
       const response = await listarPacientes();
-      setPacientes(response.data);
+      setPacientes(response.data || []);
     } catch (error) {
       console.error("Erro ao listar pacientes:", error);
+      setToast({ type: "error", message: "Erro ao carregar pacientes. Tente novamente." });
     } finally {
       setLoading(false);
     }
   };
 
-  const excluir = async (id) => {
-    if (window.confirm("Deseja realmente excluir este paciente?")) {
-      try {
-        await deletarPaciente(id);
-        carregarPacientes();
-      } catch (error) {
-        console.error("Erro ao excluir paciente:", error);
-        alert("Erro ao excluir paciente. Verifique se há consultas vinculadas.");
-      }
+  useEffect(() => {
+    carregarPacientes();
+  }, []);
+
+  const abrirModalExcluir = (paciente) => {
+    setSelectedPaciente(paciente);
+    setModalOpen(true);
+  };
+
+  const fecharModal = () => {
+    setModalOpen(false);
+    setSelectedPaciente(null);
+  };
+
+  const confirmarExclusao = async () => {
+    if (!selectedPaciente) return;
+    setProcessing(true);
+    try {
+      await deletarPaciente(selectedPaciente.id);
+      setToast({ type: "success", message: "Paciente excluído com sucesso." });
+      fecharModal();
+      carregarPacientes();
+    } catch (error) {
+      console.error("Erro ao excluir paciente:", error);
+      const msg = error?.response?.data?.message || "Erro ao excluir paciente. Verifique se há consultas vinculadas.";
+      setToast({ type: "error", message: msg });
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -41,26 +68,21 @@ const Paciente = () => {
     navigate(`/dentista/anamnese/${id}`);
   };
 
-  useEffect(() => {
-    carregarPacientes();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="container mx-auto p-6">
-        
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">Lista de Pacientes</h2>
-          
+
           <div className="flex space-x-3">
-             <button
-                onClick={() => navigate("/dashboard")}
-                className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
             >
-                <ArrowLeft size={18} />
-                Voltar
+              <ArrowLeft size={18} />
+              Voltar
             </button>
             <button
               onClick={() => navigate("/pacientes/cadastrar")}
@@ -103,19 +125,26 @@ const Paciente = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{p.telefone}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                       <div className="flex justify-center space-x-2">
-                          <button
-                            onClick={() => editar(p.id)}
-                            className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors shadow-sm"
-                          >
-                            Editar
-                          </button>
-                          
-                          <button
-                            onClick={() => excluir(p.id)}
-                            className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors shadow-sm"
-                          >
-                            Excluir
-                          </button>
+                        <button
+                          onClick={() => editar(p.id)}
+                          className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors shadow-sm"
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          onClick={() => abrirModalExcluir(p)}
+                          className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors shadow-sm"
+                        >
+                          Excluir
+                        </button>
+
+                        <button
+                          onClick={() => criarAnamnese(p.id)}
+                          className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-colors shadow-sm"
+                        >
+                          Anamnese
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -125,6 +154,25 @@ const Paciente = () => {
           </table>
         </div>
       </div>
+
+      <ConfirmModal
+        open={modalOpen}
+        title="Excluir paciente"
+        description={
+          selectedPaciente
+            ? `Deseja realmente excluir o paciente "${selectedPaciente.nome}" (ID ${selectedPaciente.id})? Esta ação não pode ser desfeita.`
+            : "Deseja realmente excluir este paciente? Esta ação não pode ser desfeita."
+        }
+        onCancel={fecharModal}
+        onConfirm={confirmarExclusao}
+        loading={processing}
+      />
+
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast({ type: null, message: null })}
+      />
     </div>
   );
 };

@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  listarAgendamentosPorDentista, 
-  deletarAgendamento, 
-  confirmarAgendamento 
+import {
+  listarAgendamentosPorDentista,
+  deletarAgendamento,
+  confirmarAgendamento
 } from "../../services/agendamentoService";
 import Navbar from "../../components/Navbar";
-import { 
-  ArrowLeft, 
-  Plus, 
-  Calendar, 
-  CheckCircle, 
-  Edit2, 
+import ConfirmModal from "../../components/ConfirmModal";
+import Toast from "../../components/Toast";
+import {
+  ArrowLeft,
+  Plus,
+  Calendar,
+  CheckCircle,
+  Edit2,
   Trash2,
   Clock,
   User
@@ -20,6 +22,11 @@ import {
 const Agendamento = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState(null); 
+  const [selectedId, setSelectedId] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [toast, setToast] = useState({ type: null, message: null });
   const navigate = useNavigate();
 
   const carregarAgendamentos = async () => {
@@ -29,40 +36,65 @@ const Agendamento = () => {
 
       if (!userId) {
         console.error("Usuário não identificado no localStorage.");
-        alert("Erro de autenticação. Faça login novamente.");
+        setToast({ type: "error", message: "Erro de autenticação. Faça login novamente." });
         navigate("/login");
         return;
       }
 
       const response = await listarAgendamentosPorDentista(userId);
       setAgendamentos(response.data);
-
     } catch (error) {
       console.error("Erro ao listar agendamentos do dentista:", error);
+      setToast({ type: "error", message: "Erro ao carregar agendamentos. Tente novamente." });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExcluir = async (id) => {
-    if (window.confirm("Tem certeza que deseja cancelar este agendamento?")) {
-      try {
-        await deletarAgendamento(id);
-        carregarAgendamentos();
-      } catch (error) {
-        console.error("Erro ao excluir agendamento:", error);
-        alert("Não foi possível excluir o agendamento.");
-      }
-    }
+  useEffect(() => {
+    carregarAgendamentos();
+  }, []);
+
+  const openDeleteModal = (id) => {
+    setSelectedId(id);
+    setModalAction("delete");
+    setModalOpen(true);
   };
 
-  const handleConfirmar = async (id) => {
+  const openConfirmModal = (id) => {
+    setSelectedId(id);
+    setModalAction("confirm");
+    setModalOpen(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalOpen(false);
+    setSelectedId(null);
+    setModalAction(null);
+  };
+
+  const handleModalConfirm = async () => {
+    if (!selectedId || !modalAction) return;
+    setProcessing(true);
+
     try {
-      await confirmarAgendamento(id);
-      carregarAgendamentos(); 
+      if (modalAction === "delete") {
+        await deletarAgendamento(selectedId);
+        setToast({ type: "success", message: "Agendamento cancelado com sucesso." });
+      } else if (modalAction === "confirm") {
+        await confirmarAgendamento(selectedId);
+        setToast({ type: "success", message: "Agendamento confirmado." });
+      }
+      setModalOpen(false);
+      setSelectedId(null);
+      setModalAction(null);
+      carregarAgendamentos();
     } catch (error) {
-      console.error("Erro ao confirmar:", error);
-      alert("Erro ao confirmar agendamento. Verifique se não há conflitos.");
+      console.error("Erro na ação do modal:", error);
+      const msg = error?.response?.data?.message || "Erro ao processar a solicitação.";
+      setToast({ type: "error", message: msg });
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -78,16 +110,11 @@ const Agendamento = () => {
     });
   };
 
-  useEffect(() => {
-    carregarAgendamentos();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="container mx-auto p-6">
-        
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Calendar className="text-blue-600 w-8 h-8" />
@@ -96,14 +123,14 @@ const Agendamento = () => {
               <p className="text-sm text-gray-500">Gerencie sua agenda de consultas</p>
             </div>
           </div>
-          
+
           <div className="flex space-x-3">
-             <button
-                onClick={() => navigate("/dashboard")}
-                className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
             >
-                <ArrowLeft size={18} />
-                Voltar
+              <ArrowLeft size={18} />
+              Voltar
             </button>
             <button
               onClick={() => navigate("/agendamentos/novo")}
@@ -141,63 +168,62 @@ const Agendamento = () => {
                 agendamentos.map((ag) => (
                   <tr key={ag.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        <div className="flex items-center gap-2 font-medium">
-                            <Clock size={16} className="text-blue-500"/>
-                            {formatarData(ag.dataHora)}
-                        </div>
+                      <div className="flex items-center gap-2 font-medium">
+                        <Clock size={16} className="text-blue-500" />
+                        {formatarData(ag.dataHora)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
-                                <User size={14}/>
-                            </div>
-                            {ag.paciente?.nome || "Paciente não identificado"}
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
+                          <User size={14} />
                         </div>
+                        {ag.paciente?.nome || "Paciente não identificado"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                        {ag.observacao || "Sem observações"}
+                      {ag.observacao || "Sem observações"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                            ag.confirmado 
-                            ? "bg-green-100 text-green-800 border border-green-200" 
-                            : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                        }`}>
-                            {ag.confirmado ? (
-                                <><CheckCircle size={14} /> Confirmado</>
-                            ) : (
-                                <><Clock size={14} /> Pendente</>
-                            )}
-                        </span>
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                        ag.confirmado
+                          ? "bg-green-100 text-green-800 border border-green-200"
+                          : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                      }`}>
+                        {ag.confirmado ? (
+                          <><CheckCircle size={14} /> Confirmado</>
+                        ) : (
+                          <><Clock size={14} /> Pendente</>
+                        )}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                       <div className="flex justify-center items-center space-x-2">
-                          
-                          {!ag.confirmado && (
-                              <button
-                                onClick={() => handleConfirmar(ag.id)}
-                                title="Confirmar Agendamento"
-                                className="p-2 rounded-lg text-green-600 hover:bg-green-50 border border-transparent hover:border-green-200 transition-all"
-                              >
-                                <CheckCircle size={18} />
-                              </button>
-                          )}
+                        {!ag.confirmado && (
+                          <button
+                            onClick={() => openConfirmModal(ag.id)}
+                            title="Confirmar Agendamento"
+                            className="p-2 rounded-lg text-green-600 hover:bg-green-50 border border-transparent hover:border-green-200 transition-all"
+                          >
+                            <CheckCircle size={18} />
+                          </button>
+                        )}
 
-                          <button
-                            onClick={() => navigate(`/agendamentos/editar/${ag.id}`)}
-                            title="Editar"
-                            className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          
-                          <button
-                            onClick={() => handleExcluir(ag.id)}
-                            title="Excluir"
-                            className="p-2 rounded-lg text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                        <button
+                          onClick={() => navigate(`/agendamentos/editar/${ag.id}`)}
+                          title="Editar"
+                          className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+
+                        <button
+                          onClick={() => openDeleteModal(ag.id)}
+                          title="Excluir"
+                          className="p-2 rounded-lg text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -207,6 +233,21 @@ const Agendamento = () => {
           </table>
         </div>
       </div>
+
+      <ConfirmModal
+        open={modalOpen}
+        title={modalAction === "delete" ? "Cancelar agendamento" : "Confirmar agendamento"}
+        description={modalAction === "delete" ? "Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita." : "Deseja confirmar este agendamento?"}
+        onCancel={handleModalCancel}
+        onConfirm={handleModalConfirm}
+        loading={processing}
+      />
+
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast({ type: null, message: null })}
+      />
     </div>
   );
 };
