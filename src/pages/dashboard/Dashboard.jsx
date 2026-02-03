@@ -122,11 +122,12 @@ const Dashboard = () => {
 
             
             <div 
-                className="bg-green-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-default opacity-80"
+                onClick={() => navigate("/servicos")}
+                className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
             >
                 <UserCog className="w-8 h-8 mb-4 opacity-80" />
-                <h3 className="text-xl font-bold mb-1">Dentistas</h3>
-                <p className="text-green-100 text-sm">Em breve...</p>
+                <h3 className="text-xl font-bold mb-1">Serviços</h3>
+                <p className="text-green-100 text-sm">Gerenciar serviços disponíveis</p>
             </div>
 
           

@@ -3,6 +3,7 @@ import { AuthProvider } from "../context/AuthContext";
 import PrivateRoute from "../components/PrivateRoute";
 import Login from "../pages/auth/Login.jsx";
 import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
+import EditarPaciente from "../pages/paciente/EditarPaciente.jsx";
 import Agendamento from "../pages/agendamento/Agendamento.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
 import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
@@ -11,6 +12,10 @@ import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
 import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
 import NovoAgendamento from "../pages/agendamento/NovoAgendamento.jsx"; import EditarAgendamento from "../pages/agendamento/EditarAgendamento.jsx";
+import ServicoList from "../pages/servico/ServicoList.jsx";
+import NovoServico from "../pages/servico/NovoServico.jsx";
+import EditarServico from "../pages/servico/EditarServico.jsx";
+
 import SobreNos from "../pages/SobreNos.jsx";
 
 export default function AppRoutes() {
@@ -32,7 +37,7 @@ export default function AppRoutes() {
             }
           />
           <Route
-            path="/servicos"
+            path="/portfolio"
             element={
               <PrivateRoute>
                 <VisualizarPortfolio />
@@ -44,6 +49,14 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pacientes/editar/:id"
+            element={
+              <PrivateRoute>
+                <EditarPaciente />
               </PrivateRoute>
             }
           />
@@ -104,6 +117,31 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <GerenciarPerfil />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/servicos"
+            element={
+              <PrivateRoute>
+                <ServicoList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/servicos/novo"
+            element={
+              <PrivateRoute>
+                <NovoServico />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/servicos/editar/:id"
+            element={
+              <PrivateRoute>
+                <EditarServico />
               </PrivateRoute>
             }
           />
