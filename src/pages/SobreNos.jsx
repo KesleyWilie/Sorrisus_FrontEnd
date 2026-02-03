@@ -20,6 +20,11 @@ const SobreNos = () => {
 
     const muralImagens = [
         "src/assets/consultorio-fachada.jpg",
+        "src/assets/foto1.jpg",
+        "src/assets/foto-destaque.jpg",
+        "src/assets/foto2.jpg",
+        "src/assets/foto3.jpg",
+        "src/assets/foto4.jpg",
     ]
 
     return (
@@ -121,23 +126,23 @@ const SobreNos = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Foto 1 */}
                         <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
-                            <img src={muralImagens[0]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
+                            <img src={muralImagens[1]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
                         </div>
                         {/* Foto Destaque */}
                         <div className="aspect-square rounded-2xl md:col-span-2 md:row-span-2 overflow-hidden shadow-md">
-                            <img src={muralImagens[0]} alt="Fachada da Clínica" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
+                            <img src={muralImagens[2]} alt="Fachada da Clínica" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
                         </div>
                         {/* Foto 2 */}
                         <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
-                            <img src={muralImagens[0]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
+                            <img src={muralImagens[3]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
                         </div>
                         {/* Foto 3 */}
                         <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
-                            <img src={muralImagens[0]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
+                            <img src={muralImagens[4]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
                         </div>
                         {/* Foto 4 */}
                         <div className="aspect-square rounded-2xl overflow-hidden shadow-md">
-                            <img src={muralImagens[0]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
+                            <img src={muralImagens[5]} alt="Procedimento" className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer" />
                         </div>
                     </div>
                 </div>
