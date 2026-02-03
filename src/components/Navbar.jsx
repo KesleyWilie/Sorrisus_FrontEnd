@@ -21,6 +21,12 @@ const Navbar = () => {
     setShowLogoutModal(false);
   };
 
+  const isPaciente = () => {
+    if (!user || !user.role) return false;
+    const role = String(user.role).toUpperCase();
+    return role === "ROLE_PACIENTE" || role === "PACIENTE";
+  };
+
   return (
     <>
       <nav className="bg-blue-600 shadow-sm border-b border-blue-700">
@@ -41,13 +47,17 @@ const Navbar = () => {
                 <Home className="w-5 h-5" />
                 <span className="font-medium">Dashboard</span>
               </Link>
-              <Link
-                to="/pacientes"
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
-              >
-                <Users className="w-5 h-5" />
-                <span className="font-medium">Pacientes</span>
-              </Link>
+
+              {!isPaciente() && (
+                <Link
+                  to="/pacientes"
+                  className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">Pacientes</span>
+                </Link>
+              )}
+
               <Link
                 to="/agendamentos"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
@@ -55,7 +65,7 @@ const Navbar = () => {
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">Agendamentos</span>
               </Link>
-              { /* Portfólio de Serviços */}
+
               <Link
                 to="/portfolio"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
@@ -63,7 +73,7 @@ const Navbar = () => {
                 <ClipboardList className="w-5 h-5" />
                 <span className="font-medium">Procedimentos</span>
               </Link>
-              { /* Sobre Nós */}
+
               <Link
                 to="/sobre-nos"
                 className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
@@ -87,7 +97,6 @@ const Navbar = () => {
                   if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
                     e.preventDefault();
                     if (!user?.role) return;
-                    const role = user.role;
                     navigate("/perfil");
                   }
                 }}
@@ -100,12 +109,12 @@ const Navbar = () => {
                   </span>
                   {user?.role && (
                     <span className="text-xs text-gray-500">
-                      {user.role.replace('ROLE_', '')}
+                      {String(user.role).replace('ROLE_', '')}
                     </span>
                   )}
                 </div>
               </div>
-              
+
               <button
                 onClick={confirmLogout}
                 className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md group"
@@ -122,7 +131,6 @@ const Navbar = () => {
       {showLogoutModal && (
         <div className="fixed inset-0 bg-white/30 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-fadeIn">
-            {/* Header do Modal */}
             <div className="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
               <div className="flex items-center justify-center mb-3">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -132,13 +140,11 @@ const Navbar = () => {
               <h3 className="text-2xl font-bold text-center">Sair do Sistema</h3>
             </div>
 
-            {/* Conteúdo do Modal */}
             <div className="p-6">
               <p className="text-gray-600 text-center mb-6">
                 Tem certeza que deseja sair do sistema Sorrisus?
               </p>
 
-              {/* Botões */}
               <div className="flex gap-3">
                 <button
                   onClick={cancelLogout}
