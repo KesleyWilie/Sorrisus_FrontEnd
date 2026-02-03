@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   listarAgendamentosPorDentista,
   deletarAgendamento,
-  confirmarAgendamento
+  confirmarAgendamento,
+  listarAgendamentosPorPaciente
 } from "../../services/agendamentoService";
 import { buscarPacientePorId } from "../../services/pacienteService";
 import Navbar from "../../components/Navbar";
@@ -34,13 +35,20 @@ const Agendamento = () => {
     setLoading(true);
     try {
       const userId = localStorage.getItem("userId");
+      const userRole = localStorage.getItem("role");
       if (!userId) {
         setToast({ type: "error", message: "Usuário não identificado. Faça login novamente." });
         navigate("/login");
         return;
       }
 
-      const resp = await listarAgendamentosPorDentista(userId);
+      let resp;
+      if (!userRole || !userRole.includes("DENTISTA")) {
+        resp = await listarAgendamentosPorPaciente(userId);
+      } else {
+        resp = await listarAgendamentosPorDentista(userId);
+      }
+
       const ags = Array.isArray(resp.data) ? resp.data : [];
 
       const pacienteIdsSet = new Set();
@@ -178,8 +186,8 @@ const Agendamento = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data / Hora</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serviço / Obs</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observação</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>                
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
