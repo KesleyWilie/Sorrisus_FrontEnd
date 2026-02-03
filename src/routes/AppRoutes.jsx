@@ -3,6 +3,7 @@ import { AuthProvider } from "../context/AuthContext";
 import PrivateRoute from "../components/PrivateRoute";
 import Login from "../pages/auth/Login.jsx";
 import ListarPaciente from "../pages/paciente/ListarPaciente.jsx";
+import EditarPaciente from "../pages/paciente/EditarPaciente.jsx";
 import Agendamento from "../pages/agendamento/Agendamento.jsx";
 import CadastrarPaciente from "../pages/paciente/CadastrarPaciente.jsx";
 import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
@@ -43,6 +44,14 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <ListarPaciente />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pacientes/editar/:id"
+            element={
+              <PrivateRoute>
+                <EditarPaciente />
               </PrivateRoute>
             }
           />

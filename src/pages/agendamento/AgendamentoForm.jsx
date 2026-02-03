@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../../components/Navbar";
 import {
   criarAgendamento,
   atualizarAgendamento,
@@ -109,6 +110,7 @@ export default function AgendamentoForm({ agendamentoId }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+     <Navbar />
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
