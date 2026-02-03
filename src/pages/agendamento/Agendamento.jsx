@@ -5,6 +5,7 @@ import {
   deletarAgendamento,
   confirmarAgendamento
 } from "../../services/agendamentoService";
+import { buscarPacientePorId } from "../../services/pacienteService";
 import Navbar from "../../components/Navbar";
 import ConfirmModal from "../../components/ConfirmModal";
 import Toast from "../../components/Toast";
@@ -23,7 +24,7 @@ const Agendamento = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null); 
+  const [modalAction, setModalAction] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [toast, setToast] = useState({ type: null, message: null });
@@ -33,18 +34,49 @@ const Agendamento = () => {
     setLoading(true);
     try {
       const userId = localStorage.getItem("userId");
-
       if (!userId) {
-        console.error("Usuário não identificado no localStorage.");
-        setToast({ type: "error", message: "Erro de autenticação. Faça login novamente." });
+        setToast({ type: "error", message: "Usuário não identificado. Faça login novamente." });
         navigate("/login");
         return;
       }
 
-      const response = await listarAgendamentosPorDentista(userId);
-      setAgendamentos(response.data);
+      const resp = await listarAgendamentosPorDentista(userId);
+      const ags = Array.isArray(resp.data) ? resp.data : [];
+
+      const pacienteIdsSet = new Set();
+      ags.forEach((ag) => {
+        const pid = ag.pacienteId ?? (ag.paciente && ag.paciente.id);
+        if (pid !== undefined && pid !== null) pacienteIdsSet.add(Number(pid));
+      });
+      const pacienteIds = Array.from(pacienteIdsSet);
+
+      const pacienteMap = {};
+      if (pacienteIds.length > 0) {
+        const promises = pacienteIds.map((id) =>
+          buscarPacientePorId(id)
+            .then((r) => {
+              if (r && r.data) pacienteMap[id] = r.data;
+            })
+            .catch((err) => {
+              console.warn(`Paciente ${id} não encontrado ou erro ao buscar:`, err);
+            })
+        );
+        await Promise.all(promises);
+      }
+
+      const enriched = ags.map((ag) => {
+        const pid = ag.pacienteId ?? (ag.paciente && ag.paciente.id);
+        const pidNum = pid !== undefined && pid !== null ? Number(pid) : null;
+        const pacienteObj = ag.paciente || (pidNum ? pacienteMap[pidNum] : null);
+        return {
+          ...ag,
+          paciente: pacienteObj,
+        };
+      });
+
+      setAgendamentos(enriched);
     } catch (error) {
-      console.error("Erro ao listar agendamentos do dentista:", error);
+      console.error("Erro ao listar agendamentos:", error);
       setToast({ type: "error", message: "Erro ao carregar agendamentos. Tente novamente." });
     } finally {
       setLoading(false);
@@ -76,12 +108,11 @@ const Agendamento = () => {
   const handleModalConfirm = async () => {
     if (!selectedId || !modalAction) return;
     setProcessing(true);
-
     try {
       if (modalAction === "delete") {
         await deletarAgendamento(selectedId);
         setToast({ type: "success", message: "Agendamento cancelado com sucesso." });
-      } else if (modalAction === "confirm") {
+      } else {
         await confirmarAgendamento(selectedId);
         setToast({ type: "success", message: "Agendamento confirmado." });
       }
@@ -89,9 +120,9 @@ const Agendamento = () => {
       setSelectedId(null);
       setModalAction(null);
       carregarAgendamentos();
-    } catch (error) {
-      console.error("Erro na ação do modal:", error);
-      const msg = error?.response?.data?.message || "Erro ao processar a solicitação.";
+    } catch (err) {
+      console.error("Erro na ação:", err);
+      const msg = err?.response?.data?.message || "Erro ao processar a solicitação.";
       setToast({ type: "error", message: msg });
     } finally {
       setProcessing(false);
@@ -101,19 +132,18 @@ const Agendamento = () => {
   const formatarData = (dataString) => {
     if (!dataString) return "-";
     const data = new Date(dataString);
-    return data.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -127,7 +157,7 @@ const Agendamento = () => {
           <div className="flex space-x-3">
             <button
               onClick={() => navigate("/dashboard")}
-              className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
+              className="flex items-center gap-2 bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium"
             >
               <ArrowLeft size={18} />
               Voltar
@@ -158,11 +188,7 @@ const Agendamento = () => {
                 <tr><td colSpan="5" className="text-center py-8 text-gray-500">Carregando sua agenda...</td></tr>
               ) : agendamentos.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500 flex flex-col items-center justify-center">
-                    <Calendar className="w-10 h-10 text-gray-300 mb-2" />
-                    <span className="text-lg font-medium text-gray-600">Sua agenda está vazia</span>
-                    <span className="text-sm">Nenhum agendamento encontrado para o seu perfil.</span>
-                  </td>
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">Nenhum agendamento encontrado.</td>
                 </tr>
               ) : (
                 agendamentos.map((ag) => (
@@ -178,50 +204,26 @@ const Agendamento = () => {
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
                           <User size={14} />
                         </div>
-                        {ag.paciente?.nome || "Paciente não identificado"}
+                        {ag.paciente?.nome || `Paciente #${ag.pacienteId}` || "Paciente não identificado"}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                      {ag.observacao || "Sem observações"}
-                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{ag.observacao || "Sem observações"}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                        ag.confirmado
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                      }`}>
-                        {ag.confirmado ? (
-                          <><CheckCircle size={14} /> Confirmado</>
-                        ) : (
-                          <><Clock size={14} /> Pendente</>
-                        )}
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${ag.confirmado ? "bg-green-100 text-green-800 border border-green-200" : "bg-yellow-50 text-yellow-700 border border-yellow-200"}`}>
+                        {ag.confirmado ? <><CheckCircle size={14} /> Confirmado</> : <><Clock size={14} /> Pendente</>}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                       <div className="flex justify-center items-center space-x-2">
                         {!ag.confirmado && (
-                          <button
-                            onClick={() => openConfirmModal(ag.id)}
-                            title="Confirmar Agendamento"
-                            className="p-2 rounded-lg text-green-600 hover:bg-green-50 border border-transparent hover:border-green-200 transition-all"
-                          >
+                          <button onClick={() => openConfirmModal(ag.id)} title="Confirmar" className="p-2 rounded-lg text-green-600 hover:bg-green-50">
                             <CheckCircle size={18} />
                           </button>
                         )}
-
-                        <button
-                          onClick={() => navigate(`/agendamentos/editar/${ag.id}`)}
-                          title="Editar"
-                          className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all"
-                        >
+                        <button onClick={() => navigate(`/agendamentos/editar/${ag.id}`)} title="Editar" className="p-2 rounded-lg text-blue-600 hover:bg-blue-50">
                           <Edit2 size={18} />
                         </button>
-
-                        <button
-                          onClick={() => openDeleteModal(ag.id)}
-                          title="Excluir"
-                          className="p-2 rounded-lg text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
-                        >
+                        <button onClick={() => openDeleteModal(ag.id)} title="Excluir" className="p-2 rounded-lg text-red-600 hover:bg-red-50">
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -243,11 +245,7 @@ const Agendamento = () => {
         loading={processing}
       />
 
-      <Toast
-        type={toast.type}
-        message={toast.message}
-        onClose={() => setToast({ type: null, message: null })}
-      />
+      <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: null, message: null })} />
     </div>
   );
 };

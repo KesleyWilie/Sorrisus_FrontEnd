@@ -6,27 +6,38 @@ import {
   atualizarAgendamento,
   buscarAgendamentoPorId
 } from "../../services/agendamentoService";
-import { listarDentistas } from "../../services/dentistaService";
 import { listarPacientes } from "../../services/pacienteService";
+import { listarDentistas } from "../../services/dentistaService";
 import { listarServicos } from "../../services/servicoService";
-import { ArrowLeft, Save, Calendar, User, Clipboard } from "lucide-react";
+import { ArrowLeft, Save, Calendar } from "lucide-react";
 
 const toInputDateTime = (isoString) => {
   if (!isoString) return "";
-  const d = new Date(isoString);
-  const pad = (n) => String(n).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  const mm = pad(d.getMonth() + 1);
-  const dd = pad(d.getDate());
-  const hh = pad(d.getHours());
-  const min = pad(d.getMinutes());
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  const s = isoString.split(".")[0];
+
+  if (/[zZ]|[+\-]\d{2}:\d{2}$/.test(isoString)) {
+    const d = new Date(isoString);
+    const pad = (n) => String(n).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const min = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  }
+
+  const parts = s.split("T");
+  if (parts.length < 2) return "";
+  const date = parts[0];
+  const time = parts[1].split(":");
+  const hh = time[0].padStart(2, "0");
+  const min = (time[1] || "00").padStart(2, "0");
+  return `${date}T${hh}:${min}`;
 };
 
-const fromInputDateTimeToISO = (value) => {
+const fromInputDateTimeToBackend = (value) => {
   if (!value) return null;
-  const d = new Date(value);
-  return d.toISOString();
+  return `${value}:00`;
 };
 
 export default function AgendamentoForm({ agendamentoId }) {
@@ -84,7 +95,7 @@ export default function AgendamentoForm({ agendamentoId }) {
     }
 
     const payload = {
-      dataHora: fromInputDateTimeToISO(dataHora),
+      dataHora: fromInputDateTimeToBackend(dataHora),
       pacienteId: Number(pacienteId),
       dentistaId: Number(dentistaId),
       servicoId: servicoId ? Number(servicoId) : null,
