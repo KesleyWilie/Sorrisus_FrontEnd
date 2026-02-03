@@ -162,14 +162,13 @@ export default function DashboardPaciente() {
         <div className="max-w-3xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div
-              onClick={() => navigate("/agendamentos")}
+              onClick={() => navigate("/historico-consultas")}
               className="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start cursor-pointer transition-colors duration-200"
             >
               <Calendar className="w-8 h-8 mb-4 opacity-80" />
               <h3 className="text-xl font-bold mb-1">Consultas</h3>
               <p className="text-purple-100 text-sm">Visualizar seu histórico de consultas</p>
             </div>
-
             <div
               onClick={() => navigate("/portfolio")}
               className="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start cursor-pointer transition-colors duration-200"
