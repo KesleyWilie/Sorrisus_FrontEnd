@@ -44,10 +44,10 @@ const HistoricoConsultas = () => {
 
         let data = [];
         if (role.includes("PACIENTE")) {
-          const res = await listarConsultasPorPaciente(userId);
+          const res = await listarConsultasPorPaciente(localStorage.getItem("userId"));
           data = Array.isArray(res.data) ? res.data : (res.data?.content || res.data?.data || []);
         } else if (role.includes("DENTISTA")) {
-          const res = await listarConsultasPorDentista(userId);
+          const res = await listarConsultasPorDentista(localStorage.getItem("userId"));
           data = Array.isArray(res.data) ? res.data : (res.data?.content || res.data?.data || []);
         } else {
           data = [];
