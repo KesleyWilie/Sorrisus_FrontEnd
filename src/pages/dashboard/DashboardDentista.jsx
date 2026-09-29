@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar.jsx";
 import { listarPacientes } from "../../services/pacienteService.js";
 import { listarDentistas } from "../../services/dentistaService.js";
 import { listarConsultasPorDentista } from "../../services/consultaService.js";
-import { Users, Calendar, UserCog, TrendingUp } from "lucide-react";
+import { Users, Calendar, UserCog, TrendingUp, Clock } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const Dashboard = () => {
@@ -15,6 +15,13 @@ const Dashboard = () => {
   const [dentistasCount, setDentistasCount] = useState(null);
   const [consultasCount, setConsultasCount] = useState(null);
   const [error, setError] = useState(null);
+  const role = String(user?.role || "").toUpperCase();
+  const podeVisualizarRetornos = [
+    "ROLE_DENTISTA",
+    "DENTISTA",
+    "ROLE_RECEPCIONISTA",
+    "RECEPCIONISTA",
+  ].includes(role);
 
   const getCurrentUserId = () => {
     if (user?.id) return user.id;
@@ -148,7 +155,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div
             onClick={() => navigate("/pacientes")}
             className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
@@ -175,6 +182,16 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold mb-1">Consultas</h3>
             <p className="text-purple-100 text-sm">Visualizar histórico de consultas</p>
           </div>
+          {podeVisualizarRetornos && (
+            <div
+              onClick={() => navigate("/retornos-pendentes")}
+              className="bg-amber-500 hover:bg-amber-600 text-white p-6 rounded-xl shadow-md flex flex-col items-start text-left cursor-pointer transition-colors duration-200"
+            >
+              <Clock className="w-8 h-8 mb-4 opacity-80" />
+              <h3 className="text-xl font-bold mb-1">Retornos Pendentes</h3>
+              <p className="text-amber-50 text-sm">Acompanhar pacientes com retorno pendente</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

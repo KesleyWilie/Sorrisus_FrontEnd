@@ -10,6 +10,7 @@ import GerenciarPerfil from "../pages/perfil/GerenciarPerfil.jsx";
 import Dashboard from "../pages/dashboard/DashboardDentista.jsx";
 import AnamneseOdontograma from "../pages/dentista/AnamneseOdontograma.jsx";
 import HistoricoConsultas from "../pages/consulta/HistoricoConsultas.jsx";
+import RetornosPendentes from "../pages/consulta/RetornosPendentes.jsx";
 import VisualizarPortfolio from "../pages/portfolio/VisualizarPortfolio.jsx";
 import NovoAgendamento from "../pages/agendamento/NovoAgendamento.jsx"; import EditarAgendamento from "../pages/agendamento/EditarAgendamento.jsx";
 import ServicoList from "../pages/servico/ServicoList.jsx";
@@ -84,6 +85,14 @@ export default function AppRoutes() {
             element={
               <PrivateRoute>
                 <HistoricoConsultas />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/retornos-pendentes"
+            element={
+              <PrivateRoute>
+                <RetornosPendentes />
               </PrivateRoute>
             }
           />

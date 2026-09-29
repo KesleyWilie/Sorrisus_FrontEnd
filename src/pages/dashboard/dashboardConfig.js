@@ -34,8 +34,8 @@ export const botoesConfig = [
   },
   {
     label: 'Retornos pendentes',
-    roles: ['ROLE_RECEPCIONISTA'],
-    action: () => alert('Em breve: Retornos pendentes'),
+    roles: ['ROLE_RECEPCIONISTA', 'ROLE_DENTISTA'],
+    action: (navigate) => navigate('/retornos-pendentes'),
   },
   {
     label: 'Visualizar perfil',

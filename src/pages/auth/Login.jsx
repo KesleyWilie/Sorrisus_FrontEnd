@@ -86,6 +86,9 @@ const Login = () => {
       } else if (response.role === "ROLE_DENTISTA" || response.role === "DENTISTA") {
         navigate("/dashboard-dentista");
         return;
+      } else if (response.role === "ROLE_RECEPCIONISTA" || response.role === "RECEPCIONISTA") {
+        navigate("/dashboard-dentista");
+        return;
       }
     } catch (err) {
       console.error("Erro ao fazer login:", err);

@@ -35,3 +35,7 @@ export const buscarConsultaPorId = (id) => {
  
   return api.get(`/consultas/${id}`);
 };
+
+export const listarRetornosPendentes = () => {
+  return api.get("/consultas/retornos-pendentes");
+};

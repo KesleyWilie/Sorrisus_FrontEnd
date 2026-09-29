@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext.jsx"; import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Home, Users, Calendar, Power, ClipboardList, Info } from "lucide-react";
+import { LogOut, User, Home, Users, Calendar, Power, ClipboardList, Info, Clock } from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -34,6 +34,12 @@ const Navbar = () => {
     return role === "ROLE_PACIENTE" || role === "PACIENTE";
   };
 
+  const podeVisualizarRetornos = () => {
+    if (!user || !user.role) return false;
+    const role = String(user.role).toUpperCase();
+    return ["ROLE_DENTISTA", "DENTISTA", "ROLE_RECEPCIONISTA", "RECEPCIONISTA"].includes(role);
+  };
+
   return (
     <>
       <nav className="bg-blue-600 shadow-sm border-b border-blue-700">
@@ -62,6 +68,16 @@ const Navbar = () => {
                 >
                   <Users className="w-5 h-5" />
                   <span className="font-medium">Pacientes</span>
+                </Link>
+              )}
+
+              {podeVisualizarRetornos() && (
+                <Link
+                  to="/retornos-pendentes"
+                  className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                >
+                  <Clock className="w-5 h-5" />
+                  <span className="font-medium">Retornos</span>
                 </Link>
               )}
 
