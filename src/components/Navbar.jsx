@@ -43,19 +43,22 @@ const Navbar = () => {
   return (
     <>
       <nav className="bg-blue-600 shadow-sm border-b border-blue-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="w-full px-2 xl:px-5 2xl:px-8">
+          <div className="flex h-16 flex-nowrap items-center">
             {/* Logo */}
-            <Link to={dashboardPath} className="flex items-center gap-3">
+            <Link
+              to={dashboardPath}
+              className="mr-3 flex shrink-0 items-center gap-3 xl:mr-6 2xl:mr-8"
+            >
               <img src="/sorrisus.png" alt="Sorrisus" className="w-10 h-10 rounded-lg object-contain" />
               <span className="text-xl font-bold text-white">Sorrisus</span>
             </Link>
 
             {/* Menu */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="flex min-w-0 flex-1 flex-nowrap items-center justify-center gap-4 xl:gap-5 2xl:gap-7">
               <Link
                 to={dashboardPath}
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
               >
                 <Home className="w-5 h-5" />
                 <span className="font-medium">Dashboard</span>
@@ -64,7 +67,7 @@ const Navbar = () => {
               {!isPaciente() && (
                 <Link
                   to="/pacientes"
-                  className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                  className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
                 >
                   <Users className="w-5 h-5" />
                   <span className="font-medium">Pacientes</span>
@@ -74,7 +77,7 @@ const Navbar = () => {
               {podeVisualizarRetornos() && (
                 <Link
                   to="/retornos-pendentes"
-                  className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                  className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
                 >
                   <Clock className="w-5 h-5" />
                   <span className="font-medium">Retornos</span>
@@ -83,7 +86,7 @@ const Navbar = () => {
 
               <Link
                 to="/agendamentos"
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
               >
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">Agendamentos</span>
@@ -91,7 +94,7 @@ const Navbar = () => {
 
               <Link
                 to="/portfolio"
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
               >
                 <ClipboardList className="w-5 h-5" />
                 <span className="font-medium">Procedimentos</span>
@@ -99,7 +102,7 @@ const Navbar = () => {
 
               <Link
                 to="/sobre-nos"
-                className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap text-white hover:text-blue-200 transition-colors xl:gap-1.5 2xl:gap-2"
               >
                 <Info className="w-5 h-5" />
                 <span className="font-medium">Sobre Nós</span>
@@ -107,7 +110,7 @@ const Navbar = () => {
             </div>
 
             {/* User Info e Logout */}
-            <div className="flex items-center gap-4">
+            <div className="ml-3 flex shrink-0 items-center gap-2 xl:ml-4 2xl:gap-4">
               <div
                 role="button"
                 tabIndex={0}
@@ -123,11 +126,11 @@ const Navbar = () => {
                     navigate("/perfil");
                   }
                 }}
-                className="flex items-center gap-3 px-4 py-2 bg-white/90 rounded-lg cursor-pointer"
+                className="flex shrink-0 items-center gap-2 rounded-lg bg-white/90 px-2 py-2 cursor-pointer 2xl:px-3"
               >
                 <User className="w-5 h-5 text-gray-700" />
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-700">
+                <div className="hidden max-w-32 flex-col items-start xl:flex 2xl:max-w-40">
+                  <span className="max-w-32 truncate text-sm font-medium text-gray-700 2xl:max-w-40">
                     {user?.email || "Usuário"}
                   </span>
                   {user?.role && (
@@ -140,10 +143,12 @@ const Navbar = () => {
 
               <button
                 onClick={confirmLogout}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md group"
+                title="Sair"
+                aria-label="Sair do sistema"
+                className="group flex shrink-0 items-center justify-center gap-2 rounded-lg p-2 text-red-600 transition-all hover:bg-red-50 hover:shadow-md 2xl:px-3"
               >
                 <Power className="w-5 h-5 group-hover:animate-pulse" />
-                <span className="font-medium">Sair</span>
+                <span className="hidden font-medium 2xl:inline">Sair</span>
               </button>
             </div>
           </div>
